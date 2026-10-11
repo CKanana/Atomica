@@ -21,26 +21,36 @@ A C++ / OpenGL desktop application that renders five historical and physical mod
 
 ## Technologies
 
-- C++
-- OpenGL (course-specified graphics environment)
-- _TODO: add libraries, compiler and build tool once confirmed (e.g. GLFW, GLAD, GLM, CMake)_
+- C++17
+- OpenGL 3.3 Core
+- GLFW (window and input), GLAD (OpenGL loader) and GLM (maths)
+- CMake build system. GLFW and GLM are downloaded automatically on the first build; GLAD is committed under `external/glad`
+- Tested with MinGW-w64 g++ (MSYS2 UCRT64) on Windows
 
 ## How to run
 
-_TODO: fill in once the project skeleton builds._
+**Requirements:** Git, CMake 3.20 or newer, and a C++17 compiler (MinGW-w64 g++ on Windows). An internet connection is needed on the first build.
 
 ```bash
-git clone <REPO_URL>
-cd atomica
-# build + run instructions here
+git clone https://github.com/CKanana/Atomica.git
+cd Atomica
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build
+./build/atomica.exe
 ```
+
+**Controls:** keys `1` to `5` jump to a stage, the Left and Right arrow keys step through the stages, and `Esc` quits.
+
+## Adding your stage
+
+Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your class in your own stage folder, then register it in `main.cpp` in place of the matching `PlaceholderStage`. The stage manager handles switching, the render loop and key input.
 
 ## Team and responsibilities
 
 | Member | GitHub | Responsibility |
 |--------|--------|----------------|
 | Crystal Kanana | @TODO | TODO |
-| Donell Bikketi | @TODO | TODO |
+| Donell Bikketi | @D0nell | Core + integration: project skeleton, render loop, stage manager, merging PRs |
 | Emanuel Douglas | @TODO | TODO |
 | Patrick Maina | @TODO | TODO |
 | Gloria Kendi | @TODO | TODO |
@@ -62,18 +72,22 @@ Suggested split: one lead for each of Stages 1-5, plus one member owning integra
 ## Repository layout
 
 ```
-atomica/
+Atomica/
 ├── src/
-│   ├── core/            # window, main loop, shared math, shader loader
+│   ├── core/            # window, main loop, stage manager, shared math, shader loader
 │   ├── stage1_planetary/
 │   ├── stage2_bohr/
 │   ├── stage3_waves/
 │   ├── stage4_clouds/
 │   ├── stage5_shaded/
-│   └── ui/              # sidebar, info panel, stage navigation
+│   ├── ui/              # sidebar, info panel, stage navigation
+│   └── main.cpp
+├── external/
+│   └── glad/            # OpenGL loader (generated, OpenGL 3.3 core)
 ├── shaders/
 ├── assets/
 ├── docs/                # technique write-ups, screenshots, design wireframe
+├── CMakeLists.txt
 ├── README.md
 └── CONTRIBUTING.md
 ```
