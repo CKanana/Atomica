@@ -34,33 +34,35 @@ These stages describe the project direction; their atom renderers are not part o
 ## Technologies
 
 - C++17
-- CMake 3.20 or newer
-- No external graphics dependencies are required for the current software-rendered checkpoint
-- OpenGL is part of the planned application direction, but is not currently used by the build
+- OpenGL 3.3 Core
+- GLFW (window and input), GLAD (OpenGL loader) and GLM (maths)
+- CMake build system. GLFW and GLM are downloaded automatically on the first build; GLAD is committed under `external/glad`
+- Tested with MinGW-w64 g++ (MSYS2 UCRT64) on Windows
 
 ## Build and Run
 
-From the repository root, configure and build with CMake:
+**Requirements:** Git, CMake 3.20 or newer, and a C++17 compiler (MinGW-w64 g++ on Windows). An internet connection is needed on the first build.
 
-```powershell
-cmake -S . -B build
-cmake --build build --config Release
+```bash
+git clone https://github.com/CKanana/Atomica.git
+cd Atomica
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build
+./build/atomica.exe
 ```
 
-With the Visual Studio CMake generator, run the demo with:
+**Controls:** keys `1` to `5` jump to a stage, the Left and Right arrow keys step through the stages, and `Esc` quits.
 
-```powershell
-.\build\Release\checkpoint1_demo.exe
-```
+## Adding your stage
 
-With a single-configuration generator such as Ninja, the executable is typically at `build/checkpoint1_demo.exe`. The demo writes `checkpoint1_ui_demo.bmp` to the current working directory.
+Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your class in your own stage folder, then register it in `main.cpp` in place of the matching `PlaceholderStage`. The stage manager handles switching, the render loop and key input.
 
-## Team and Responsibilities
+## Team and responsibilities
 
 | Member | GitHub | Responsibility |
 |--------|--------|----------------|
 | Crystal Kanana | @TODO | TODO |
-| Donell Bikketi | @TODO | TODO |
+| Donell Bikketi | @D0nell | Core + integration: project skeleton, render loop, stage manager, merging PRs |
 | Emanuel Douglas | @TODO | TODO |
 | Patrick Maina | @TODO | TODO |
 | Gloria Kendi | @TODO | TODO |
@@ -82,7 +84,7 @@ Suggested split: one lead for each of Stages 1-5, plus one member owning integra
 ## Repository Layout
 
 ```
-atomica/
+Atomica/
 ├── src/
 │   ├── core/            # Planned shared application infrastructure
 │   ├── stage1_planetary/ # Planned atom model stages
@@ -90,10 +92,14 @@ atomica/
 │   ├── stage3_waves/
 │   ├── stage4_clouds/
 │   ├── stage5_shaded/
-│   └── ui/              # Software canvas, UI components, layout, and demo
-├── shaders/             # Planned rendering assets
-├── assets/              # Application assets
-├── docs/                # Project documentation and design material
+│   ├── ui/              # sidebar, info panel, stage navigation
+│   └── main.cpp
+├── external/
+│   └── glad/            # OpenGL loader (generated, OpenGL 3.3 core)
+├── shaders/
+├── assets/
+├── docs/                # technique write-ups, screenshots, design wireframe
+├── CMakeLists.txt
 ├── README.md
 └── CONTRIBUTING.md
 ```
