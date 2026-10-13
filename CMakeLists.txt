@@ -1,49 +1,38 @@
 cmake_minimum_required(VERSION 3.20)
-project(Atomica LANGUAGES C CXX)
+project(Atomica VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Lets older third-party libraries configure under newer CMake versions
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+# UI Source Files
+set(UI_SOURCES
+    src/ui/Font8x8.h
+    src/ui/Font8x8.cpp
+    src/ui/Types.h
+    src/ui/ICanvas.h
+    src/ui/SoftwareCanvas.h
+    src/ui/SoftwareCanvas.cpp
+    src/ui/UIComponent.h
+    src/ui/UIPanel.h
+    src/ui/UIPanel.cpp
+    src/ui/UIButton.h
+    src/ui/UIButton.cpp
+    src/ui/UISlider.h
+    src/ui/UISlider.cpp
+    src/ui/UIStageNavigator.h
+    src/ui/UIStageNavigator.cpp
+    src/ui/UIInfoPanel.h
+    src/ui/UIInfoPanel.cpp
+    src/ui/UIControlPanel.h
+    src/ui/UIControlPanel.cpp
+    src/ui/UILayoutManager.h
+    src/ui/UILayoutManager.cpp
+)
 
-include(FetchContent)
+# UI Library
+add_library(atomica_ui STATIC ${UI_SOURCES})
+target_include_directories(atomica_ui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ui)
 
-# GLFW: window and input
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(glfw
-    GIT_REPOSITORY https://github.com/glfw/glfw.git
-    GIT_TAG 3.4)
-
-# GLM: vectors and matrices
-FetchContent_Declare(glm
-    GIT_REPOSITORY https://github.com/g-truc/glm.git
-    GIT_TAG 1.0.1)
-
-FetchContent_MakeAvailable(glfw glm)
-
-# GLAD: OpenGL function loader (already in external/glad)
-add_library(glad STATIC external/glad/src/gl.c)
-target_include_directories(glad PUBLIC external/glad/include)
-
-# Every .cpp file under src/ is picked up automatically
-file(GLOB_RECURSE ATOMICA_SOURCES CONFIGURE_DEPENDS src/*.cpp)
-
-add_executable(atomica ${ATOMICA_SOURCES})
-target_include_directories(atomica PRIVATE src)
-target_link_libraries(atomica PRIVATE glad glfw glm::glm)
-
-# MinGW: bundle the runtime so the .exe runs on any Windows laptop
-if(MINGW)
-    target_link_options(atomica PRIVATE -static)
-endif()
-
-# Copy shaders/ and assets/ next to the .exe after every build
-add_custom_command(TARGET atomica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:atomica>/shaders
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:atomica>/assets)
+# Checkpoint 1 Demo Executable
+add_executable(checkpoint1_demo src/ui/demo_checkpoint1.cpp)
+target_link_libraries(checkpoint1_demo PRIVATE atomica_ui)

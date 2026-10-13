@@ -1,23 +1,35 @@
-# Atomica — From Orbits to Probability Clouds
+# Atomica: From Orbits to Probability Clouds
 
-**Group 5 · Quantum Visuals Inc. · Computer Graphics Semester Project**
+**Group 5 | Quantum Visuals Inc. | Computer Graphics Semester Project**
 
-A C++ / OpenGL desktop application that renders five historical and physical models of the **hydrogen atom** in sequence, so the user can see how our picture of "what an atom looks like" evolved, and why each earlier model was replaced.
+Atomica is a C++ project about how scientific models of the hydrogen atom evolved. The project is planned as a sequence of five visual stages. The current checkpoint builds a software-rendered interface and a static atom preview using computer graphics algorithms implemented in C++.
 
-## The five stages
+## Current Checkpoint
 
-| # | Stage | What it shows | Graphics techniques |
-|---|-------|---------------|---------------------|
-| 1 | Planetary | Electrons on fixed circular orbits (intuitive but wrong) | Circle / ellipse drawing algorithms, colour models |
-| 2 | Bohr | Quantised energy levels, photon absorption and emission | Raster operations, frame-based animation |
-| 3 | Standing Waves | Electrons as waves wrapped around the nucleus | Parametric curves, Bézier splines |
-| 4 | 3D Probability Clouds | Electron position as a point cloud from hydrogen s and p wavefunctions | 3D transformations, homogeneous coordinates |
-| 5 | Shaded Rendering | Lit, textured final visual | Lighting and shading models, texture mapping |
+The `checkpoint1_demo` executable draws a 1280 x 720 interface and hydrogen atom preview, then saves the result as `checkpoint1_ui_demo.bmp` in its working directory. It runs without an OpenGL context or third-party graphics libraries.
 
-## Scope
+The new UI framework includes:
 
-- **In:** hydrogen atom only, using known closed-form wavefunctions for s and p orbitals; interactive, user-driven navigation between stages.
-- **Out:** multi-electron atoms, live numerical solving of Schrödinger's equation, N-body electron dynamics, VR / AR / mobile / web.
+- A software canvas with line, rectangle, circle, ellipse, and cubic Bézier drawing
+- Cohen-Sutherland line clipping and alpha blending
+- An 8 x 8 bitmap font and BMP/PPM image export
+- Reusable panels, buttons, sliders, stage navigation, and information/control panels
+- A layout manager that coordinates the UI and central model viewport
+- A demo scene showing planetary orbits, a de Broglie wave preview, and hydrogen atom annotations
+
+The UI components expose mouse-event handling, but the current demo renders a single frame to an image rather than running as an interactive desktop window.
+
+## Planned Atom Stages
+
+These stages describe the project direction; their atom renderers are not part of the current checkpoint yet.
+
+| # | Stage | Planned visualization | Graphics topics |
+|---|-------|------------------------|-----------------|
+| 1 | Planetary | Electrons on fixed circular orbits | Circle and ellipse algorithms, colour models |
+| 2 | Bohr | Quantised energy levels and photon transitions | Raster operations, frame-based animation |
+| 3 | Standing Waves | Matter waves around the nucleus | Parametric curves, Bézier splines |
+| 4 | 3D Probability Clouds | Point clouds for hydrogen s and p orbitals | 3D transformations, homogeneous coordinates |
+| 5 | Shaded Rendering | Lit and textured probability clouds | Lighting, shading, texture mapping |
 
 ## Technologies
 
@@ -27,7 +39,7 @@ A C++ / OpenGL desktop application that renders five historical and physical mod
 - CMake build system. GLFW and GLM are downloaded automatically on the first build; GLAD is committed under `external/glad`
 - Tested with MinGW-w64 g++ (MSYS2 UCRT64) on Windows
 
-## How to run
+## Build and Run
 
 **Requirements:** Git, CMake 3.20 or newer, and a C++17 compiler (MinGW-w64 g++ on Windows). An internet connection is needed on the first build.
 
@@ -58,7 +70,7 @@ Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your 
 
 Suggested split: one lead for each of Stages 1-5, plus one member owning integration, UI, testing and documentation throughout. Everyone should understand the whole application and be able to explain their contribution.
 
-## Timeline (12 weeks)
+## Timeline (12 Weeks)
 
 | Weeks | Milestone |
 |-------|-----------|
@@ -69,13 +81,13 @@ Suggested split: one lead for each of Stages 1-5, plus one member owning integra
 | 10-11 | Shaded Rendering |
 | 12 | Integration, testing, polish |
 
-## Repository layout
+## Repository Layout
 
 ```
 Atomica/
 ├── src/
-│   ├── core/            # window, main loop, stage manager, shared math, shader loader
-│   ├── stage1_planetary/
+│   ├── core/            # Planned shared application infrastructure
+│   ├── stage1_planetary/ # Planned atom model stages
 │   ├── stage2_bohr/
 │   ├── stage3_waves/
 │   ├── stage4_clouds/
