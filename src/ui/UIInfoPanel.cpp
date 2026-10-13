@@ -77,7 +77,7 @@ void UIInfoPanel::render(ICanvas& canvas) {
 
     // --- Section 3: Why It Failed / Physical Crisis ---
     Rect alertBox(m_bounds.x + padding, curY, contentWidth, 110);
-    canvas.fillRect(alertBox, Color(40, 20, 24));
+    canvas.fillRect(alertBox, Color::DangerSurface());
     canvas.drawRect(alertBox, Color::DangerRed());
 
     canvas.drawText(alertBox.x + 10, alertBox.y + 10, "! Why It Failed (Crisis):", Color::DangerRed());
@@ -85,7 +85,7 @@ void UIInfoPanel::render(ICanvas& canvas) {
 
     auto failureLines = wrapText(m_currentMetadata.whyItFailed, maxChars - 2);
     for (const auto& line : failureLines) {
-        canvas.drawText(alertBox.x + 10, alertY, line, Color(254, 202, 202));
+        canvas.drawText(alertBox.x + 10, alertY, line, Color::DangerText());
         alertY += 15;
     }
     curY += alertBox.height + 20;

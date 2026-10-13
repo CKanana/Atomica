@@ -17,9 +17,9 @@ private:
     std::string m_label;
     ClickCallback m_onClick;
 
-    Color m_colorNormal   = Color(28, 38, 56);
-    Color m_colorHover    = Color(38, 52, 78);
-    Color m_colorPressed  = Color(16, 24, 38);
+    Color m_colorNormal   = Color::ControlSurface();
+    Color m_colorHover    = Color::ControlHover();
+    Color m_colorPressed  = Color::ControlPressed();
     Color m_colorBorder   = Color::Border();
     Color m_colorBorderActive = Color::BorderActive();
     Color m_colorText     = Color::TextPrimary();

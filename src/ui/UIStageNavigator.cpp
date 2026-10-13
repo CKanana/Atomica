@@ -108,7 +108,7 @@ void UIStageNavigator::render(ICanvas& canvas) {
         bool isPast = (static_cast<int>(node.id) < static_cast<int>(m_currentStage));
 
         // Node card background
-        Color nodeBg = isActive ? Color(16, 42, 60) : (node.isHovered ? Color(28, 38, 56) : Color(20, 26, 38));
+        Color nodeBg = isActive ? Color::AccentSurface() : (node.isHovered ? Color::ControlSurface() : Color::PanelSurface());
         canvas.fillRect(node.bounds, nodeBg);
 
         // Node border
@@ -128,7 +128,7 @@ void UIStageNavigator::render(ICanvas& canvas) {
         canvas.drawText(node.bounds.x + 26, node.bounds.y + 8, node.label, textColor);
 
         // Stage Year
-        Color yearColor = isActive ? Color::TextHighlight() : Color(100, 116, 139);
+        Color yearColor = isActive ? Color::TextHighlight() : Color::MutedText();
         canvas.drawText(node.bounds.x + 26, node.bounds.y + 24, node.year, yearColor);
     }
 

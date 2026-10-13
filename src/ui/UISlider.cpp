@@ -67,7 +67,7 @@ void UISlider::render(ICanvas& canvas) {
 
     // 2. Draw Track
     Rect track = getTrackRect();
-    canvas.fillRect(track, Color(30, 41, 59));
+    canvas.fillRect(track, Color::SliderTrack());
     canvas.drawRect(track, Color::Border());
 
     // 3. Draw Active Fill from min to knob

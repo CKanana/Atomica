@@ -48,18 +48,18 @@ int main() {
     canvas.setClipRect(vp);
 
     // A. Subdued Coordinate Crosshairs (Bresenham Line)
-    Color gridColor(24, 32, 48);
+    Color gridColor = Color::GridLine();
     canvas.drawLine(centerX - 240, centerY, centerX + 240, centerY, gridColor);
     canvas.drawLine(centerX, centerY - 240, centerX, centerY + 240, gridColor);
 
     // B. Circular Planetary Orbit (Midpoint Circle Algorithm)
     int r1 = 140;
-    canvas.drawCircle(centerX, centerY, r1, Color(30, 60, 90));
+    canvas.drawCircle(centerX, centerY, r1, Color::OrbitPrimary());
 
     // C. Elliptical Planetary Orbit (Midpoint Ellipse Algorithm)
     int rx = 210;
     int ry = 120;
-    canvas.drawEllipse(centerX, centerY, rx, ry, Color(40, 80, 115));
+    canvas.drawEllipse(centerX, centerY, rx, ry, Color::OrbitSecondary());
 
     // D. de Broglie Matter Wave Preview (Cubic Bézier Splines)
     // Four Bézier segments approximating oscillating wave lobes around the orbit
@@ -67,24 +67,24 @@ int main() {
     Point2D c1(centerX - 140, centerY - 60);
     Point2D c2(centerX - 60,  centerY - 170);
     Point2D w1(centerX,       centerY - 140);
-    canvas.drawBezier(w0, c1, c2, w1, Color(0, 180, 216));
+    canvas.drawBezier(w0, c1, c2, w1, Color::WaveLine());
 
     Point2D w2(centerX + 140, centerY);
     Point2D c3(centerX + 60,  centerY - 110);
     Point2D c4(centerX + 140, centerY - 60);
-    canvas.drawBezier(w1, c3, c4, w2, Color(0, 180, 216));
+    canvas.drawBezier(w1, c3, c4, w2, Color::WaveLine());
 
     // E. Central Nucleus (Midpoint Circle Fill)
     int nucleusRadius = 14;
     canvas.fillCircle(centerX, centerY, nucleusRadius, Color::NucleusAmber());
-    canvas.drawCircle(centerX, centerY, nucleusRadius + 3, Color(251, 191, 36, 120)); // Soft halo
+    canvas.drawCircle(centerX, centerY, nucleusRadius + 3, Color::NucleusHalo());
 
     // F. Electron Nodes (Midpoint Circle Fill with Quantum Cyan)
     // Electron on circular orbit (angle ~ 45 deg)
     int e1X = centerX + static_cast<int>(r1 * 0.707f);
     int e1Y = centerY - static_cast<int>(r1 * 0.707f);
     canvas.fillCircle(e1X, e1Y, 7, Color::ElectronCyan());
-    canvas.drawCircle(e1X, e1Y, 10, Color(0, 229, 255, 100)); // Glow ring
+    canvas.drawCircle(e1X, e1Y, 10, Color::ElectronGlow());
 
     // Electron on elliptical orbit
     int e2X = centerX - rx + 30;
@@ -94,11 +94,11 @@ int main() {
     // G. Viewport HUD Annotations (8x8 Bitmap Font)
     canvas.drawText(vp.x + 20, vp.y + 20, "HYDROGEN ATOM (H-1) : STAGE 1 PREVIEW", Color::TextHighlight());
     canvas.drawText(vp.x + 20, vp.y + 36, "Orbits: Circle r=140px | Ellipse rx=210px, ry=120px", Color::TextSecondary());
-    canvas.drawText(vp.x + 20, vp.y + 52, "Demonstrating: Bresenham, Midpoint Circle/Ellipse, Bezier", Color(100, 116, 139));
+    canvas.drawText(vp.x + 20, vp.y + 52, "Demonstrating: Bresenham, Midpoint Circle/Ellipse, Bezier", Color::MutedText());
 
     // Telemetry badge
     Rect telemetryBox(vp.right() - 200, vp.bottom() - 65, 180, 50);
-    canvas.fillRect(telemetryBox, Color(16, 22, 34));
+    canvas.fillRect(telemetryBox, Color::TelemetrySurface());
     canvas.drawRect(telemetryBox, Color::Border());
     canvas.drawText(telemetryBox.x + 10, telemetryBox.y + 10, "Z = 1 (Proton: +1e)", Color::NucleusAmber());
     canvas.drawText(telemetryBox.x + 10, telemetryBox.y + 28, "e- = 1 (Charge: -1e)", Color::ElectronCyan());

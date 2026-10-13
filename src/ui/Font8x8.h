@@ -12,3 +12,4 @@ namespace atomica::ui {
 extern const uint8_t FONT_8X8[95][8];
 
 } // namespace atomica::ui
+

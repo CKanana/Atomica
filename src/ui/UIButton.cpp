@@ -10,13 +10,13 @@ UIButton::UIButton(const std::string& label, const Rect& bounds, ClickCallback o
 void UIButton::setAccent(bool isAccent) {
     m_isAccent = isAccent;
     if (m_isAccent) {
-        m_colorNormal  = Color(0, 115, 140);
-        m_colorHover   = Color(0, 160, 195);
-        m_colorPressed = Color(0, 90, 110);
+        m_colorNormal  = Color::AccentButton();
+        m_colorHover   = Color::AccentHover();
+        m_colorPressed = Color::AccentPressed();
     } else {
-        m_colorNormal  = Color(28, 38, 56);
-        m_colorHover   = Color(38, 52, 78);
-        m_colorPressed = Color(16, 24, 38);
+        m_colorNormal  = Color::ControlSurface();
+        m_colorHover   = Color::ControlHover();
+        m_colorPressed = Color::ControlPressed();
     }
 }
 
@@ -26,7 +26,7 @@ void UIButton::render(ICanvas& canvas) {
     // Pick background color based on interaction state
     Color bg = m_colorNormal;
     if (!m_enabled) {
-        bg = Color(20, 24, 32);
+        bg = Color::DisabledSurface();
     } else if (m_isPressed) {
         bg = m_colorPressed;
     } else if (m_isHovered) {

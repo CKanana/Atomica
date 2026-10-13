@@ -36,6 +36,24 @@ struct Color {
     static constexpr Color PanelHeader()     { return Color(28, 36, 52); }     // #1C2434
     static constexpr Color Border()          { return Color(46, 58, 82); }     // #2E3A52
     static constexpr Color BorderActive()    { return Color(0, 229, 255); }    // Quantum Cyan
+    static constexpr Color ControlSurface()  { return Color(28, 38, 56); }
+    static constexpr Color ControlHover()    { return Color(38, 52, 78); }
+    static constexpr Color ControlPressed()  { return Color(16, 24, 38); }
+    static constexpr Color AccentSurface()   { return Color(16, 42, 60); }
+    static constexpr Color AccentButton()    { return Color(0, 115, 140); }
+    static constexpr Color AccentHover()     { return Color(0, 160, 195); }
+    static constexpr Color AccentPressed()   { return Color(0, 90, 110); }
+    static constexpr Color DisabledSurface() { return Color(20, 24, 32); }
+    static constexpr Color SliderTrack()     { return Color(30, 41, 59); }
+    static constexpr Color MutedText()       { return Color(100, 116, 139); }
+    static constexpr Color DangerSurface()   { return Color(40, 20, 24); }
+    static constexpr Color DangerText()      { return Color(254, 202, 202); }
+
+    static constexpr Color GridLine()        { return Color(24, 32, 48); }
+    static constexpr Color OrbitPrimary()    { return Color(30, 60, 90); }
+    static constexpr Color OrbitSecondary()  { return Color(40, 80, 115); }
+    static constexpr Color WaveLine()        { return Color(0, 180, 216); }
+    static constexpr Color TelemetrySurface(){ return Color(16, 22, 34); }
     
     static constexpr Color TextPrimary()     { return Color(240, 244, 250); }   // Crisp White
     static constexpr Color TextSecondary()   { return Color(148, 163, 184); }   // Muted Slate
@@ -43,6 +61,8 @@ struct Color {
     
     static constexpr Color ElectronCyan()    { return Color(0, 229, 255); }    // Cyan accent
     static constexpr Color NucleusAmber()    { return Color(251, 191, 36); }   // Warm Gold / Amber
+    static constexpr Color NucleusHalo()     { return Color(251, 191, 36, 120); }
+    static constexpr Color ElectronGlow()    { return Color(0, 229, 255, 100); }
     static constexpr Color DangerRed()       { return Color(248, 113, 113); }  // Failure indicator
     static constexpr Color SuccessGreen()    { return Color(52, 211, 153); }   // Valid state
 };
