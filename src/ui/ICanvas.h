@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include <string>
+#include <vector>
 
 namespace atomica::ui {
 
@@ -47,6 +48,11 @@ public:
     // Clipping support (Cohen-Sutherland / Bounding box)
     virtual void setClipRect(const Rect& clipRect) = 0;
     virtual void resetClipRect() = 0;
+
+    // Polygon drawing & filling
+    virtual void drawPolygon(const std::vector<Point2D>& points, const Color& color) = 0;
+    virtual void fillPolygon(const std::vector<Point2D>& points, const Color& color) = 0;
+    virtual void fillTriangle(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Color& color) = 0;
 };
 
 } // namespace atomica::ui
