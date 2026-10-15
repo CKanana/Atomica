@@ -3,6 +3,8 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <vector>
+#include <climits>
 
 namespace atomica::ui {
 
@@ -164,6 +166,95 @@ void SoftwareCanvas::fillRect(const Rect& rect, const Color& color) {
     }
 }
 
+void SoftwareCanvas::drawPolygon(const std::vector<Point2D>& points, const Color& color) {
+    if (points.size() < 2) return;
+
+    for (size_t i = 0; i < points.size(); ++i) {
+        const Point2D& p0 = points[i];
+        const Point2D& p1 = points[(i + 1) % points.size()];
+        drawLine(p0.x, p0.y, p1.x, p1.y, color);
+    }
+}
+
+void SoftwareCanvas::fillTriangle(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Color& color) {
+    Point2D a = p0, b = p1, c = p2;
+
+    if (a.y > b.y) std::swap(a, b);
+    if (a.y > c.y) std::swap(a, c);
+    if (b.y > c.y) std::swap(b, c);
+
+    int total_height = c.y - a.y;
+    if (total_height == 0) return;
+
+    for (int y = a.y; y <= c.y; ++y) {
+        if (y < m_clipRect.y || y >= m_clipRect.bottom()) continue;
+
+        bool second_half = (y > b.y) || (b.y == a.y);
+        int segment_height = second_half ? (c.y - b.y) : (b.y - a.y);
+        if (segment_height == 0) continue;
+
+        float alpha = static_cast<float>(y - a.y) / total_height;
+        float beta  = static_cast<float>(y - (second_half ? b.y : a.y)) / segment_height;
+
+        int x_left  = a.x + static_cast<int>((c.x - a.x) * alpha);
+        int x_right = second_half ? (b.x + static_cast<int>((c.x - b.x) * beta))
+                                  : (a.x + static_cast<int>((b.x - a.x) * beta));
+
+        if (x_left > x_right) std::swap(x_left, x_right);
+
+        int startX = std::max(m_clipRect.x, x_left);
+        int endX   = std::min(m_clipRect.right() - 1, x_right);
+
+        for (int x = startX; x <= endX; ++x) {
+            drawPixel(x, y, color);
+        }
+    }
+}
+
+void SoftwareCanvas::fillPolygon(const std::vector<Point2D>& points, const Color& color) {
+    if (points.size() < 3) return;
+
+    int minY = points[0].y;
+    int maxY = points[0].y;
+    for (const auto& pt : points) {
+        minY = std::min(minY, pt.y);
+        maxY = std::max(maxY, pt.y);
+    }
+
+    minY = std::max(m_clipRect.y, minY);
+    maxY = std::min(m_clipRect.bottom() - 1, maxY);
+
+    for (int y = minY; y <= maxY; ++y) {
+        std::vector<int> nodeX;
+        size_t n = points.size();
+
+        for (size_t i = 0; i < n; ++i) {
+            const Point2D& p1 = points[i];
+            const Point2D& p2 = points[(i + 1) % n];
+
+            if ((p1.y < y && p2.y >= y) || (p2.y < y && p1.y >= y)) {
+                int intersectX = p1.x + static_cast<int>(
+                    (static_cast<float>(y - p1.y) / (p2.y - p1.y)) * (p2.x - p1.x)
+                );
+                nodeX.push_back(intersectX);
+            }
+        }
+
+        if (nodeX.empty()) continue;
+
+        std::sort(nodeX.begin(), nodeX.end());
+
+        for (size_t i = 0; i + 1 < nodeX.size(); i += 2) {
+            int startX = std::max(m_clipRect.x, nodeX[i]);
+            int endX   = std::min(m_clipRect.right() - 1, nodeX[i + 1]);
+
+            for (int x = startX; x <= endX; ++x) {
+                drawPixel(x, y, color);
+            }
+        }
+    }
+}
+
 // --- 3. Midpoint Circle Algorithm ---
 
 void SoftwareCanvas::drawCircle(int cx, int cy, int radius, const Color& color) {
@@ -174,7 +265,7 @@ void SoftwareCanvas::drawCircle(int cx, int cy, int radius, const Color& color) 
 
     int x = 0;
     int y = radius;
-    int d = 1 - radius; // Midpoint decision parameter
+    int d = 1 - radius;
 
     auto plot8 = [this, cx, cy, &color](int px, int py) {
         drawPixel(cx + px, cy + py, color);
@@ -292,7 +383,6 @@ void SoftwareCanvas::drawEllipse(int cx, int cy, int rx, int ry, const Color& co
 void SoftwareCanvas::drawBezier(const Point2D& p0, const Point2D& p1,
                                 const Point2D& p2, const Point2D& p3,
                                 const Color& color) {
-    // Number of line segments to approximate curve smoothly
     constexpr int SEGMENTS = 48;
     Point2D prevPt = p0;
 
@@ -304,7 +394,6 @@ void SoftwareCanvas::drawBezier(const Point2D& p0, const Point2D& p1,
         float uuu = uu * u;
         float ttt = tt * t;
 
-        // B(t) = (1-t)^3 * P0 + 3(1-t)^2 * t * P1 + 3(1-t) * t^2 * P2 + t^3 * P3
         float bx = uuu * p0.x + 3.0f * uu * t * p1.x + 3.0f * u * tt * p2.x + ttt * p3.x;
         float by = uuu * p0.y + 3.0f * uu * t * p1.y + 3.0f * u * tt * p2.y + ttt * p3.y;
 
@@ -327,20 +416,18 @@ void SoftwareCanvas::drawText(int x, int y, const std::string& text, const Color
             continue;
         }
 
-        // ASCII 32 (' ') to 126 ('~')
         if (c >= 32 && c <= 126) {
             int glyphIdx = c - 32;
             for (int row = 0; row < 8; ++row) {
                 uint8_t rowBits = FONT_8X8[glyphIdx][row];
                 for (int col = 0; col < 8; ++col) {
-                    // Check bit from left to right (MSB to LSB)
                     if ((rowBits >> (7 - col)) & 0x01) {
                         drawPixel(curX + col, curY + row, color);
                     }
                 }
             }
         }
-        curX += 8; // Advance character width
+        curX += 8;
     }
 }
 
@@ -348,7 +435,7 @@ void SoftwareCanvas::drawText(int x, int y, const std::string& text, const Color
 
 #pragma pack(push, 1)
 struct BMPHeader {
-    uint16_t fileType{0x4D42}; // "BM"
+    uint16_t fileType{0x4D42};
     uint32_t fileSize{0};
     uint16_t reserved1{0};
     uint16_t reserved2{0};
@@ -376,7 +463,6 @@ bool SoftwareCanvas::saveToBMP(const std::string& filepath) const {
     std::ofstream out(filepath, std::ios::binary);
     if (!out) return false;
 
-    // Rows must be padded to a multiple of 4 bytes
     int rowPadding = (4 - ((m_width * 3) % 4)) % 4;
     uint32_t rowStride = m_width * 3 + rowPadding;
     uint32_t imageSize = rowStride * m_height;
@@ -386,7 +472,7 @@ bool SoftwareCanvas::saveToBMP(const std::string& filepath) const {
 
     BMPInfoHeader infoHeader;
     infoHeader.width = m_width;
-    infoHeader.height = m_height; // Positive = bottom-up DIB
+    infoHeader.height = m_height;
     infoHeader.sizeImage = imageSize;
 
     out.write(reinterpret_cast<const char*>(&fileHeader), sizeof(fileHeader));
@@ -394,11 +480,9 @@ bool SoftwareCanvas::saveToBMP(const std::string& filepath) const {
 
     std::vector<uint8_t> paddingBytes(rowPadding, 0);
 
-    // BMP is stored bottom-to-top
     for (int y = m_height - 1; y >= 0; --y) {
         for (int x = 0; x < m_width; ++x) {
             const Color& c = m_pixels[y * m_width + x];
-            // Format is BGR
             uint8_t bgr[3] = { c.b, c.g, c.r };
             out.write(reinterpret_cast<const char*>(bgr), 3);
         }

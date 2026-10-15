@@ -78,6 +78,10 @@ public:
     void setClipRect(const Rect& clipRect) override;
     void resetClipRect() override;
 
+    void drawPolygon(const std::vector<Point2D>& points, const Color& color) override;
+    void fillPolygon(const std::vector<Point2D>& points, const Color& color) override;
+    void fillTriangle(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Color& color) override;
+
     // --- Output & OpenGL Bridge ---
     const Color* getPixelData() const { return m_pixels.data(); }
     const std::vector<Color>& getPixels() const { return m_pixels; }
