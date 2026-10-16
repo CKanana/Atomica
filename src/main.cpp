@@ -8,6 +8,8 @@
 
 #include "core/PlaceholderStage.h"
 #include "core/StageManager.h"
+#include "stage1_planetary/PlanetaryStage.h"
+#include "ui/SoftwareCanvas.h"
 
 static void onFramebufferResize(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
@@ -60,8 +62,15 @@ int main() {
     std::printf("OpenGL %s\n", glGetString(GL_VERSION));
 
     {   // Inner scope: stages are destroyed while the OpenGL context is still alive
+        
+        // 1. Create the software canvas for your stage to draw on
+        static atomica::ui::SoftwareCanvas sharedCanvas(1280, 720);
+        
         StageManager stages;
-        stages.add(std::make_unique<PlaceholderStage>("Planetary",       0.20f, 0.05f, 0.05f));
+        
+        // 2. Replace the Planetary PlaceholderStage with your actual class
+        stages.add(std::make_unique<PlanetaryStage>(&sharedCanvas));
+        
         stages.add(std::make_unique<PlaceholderStage>("Bohr",            0.05f, 0.08f, 0.25f));
         stages.add(std::make_unique<PlaceholderStage>("Standing Waves",  0.05f, 0.20f, 0.10f));
         stages.add(std::make_unique<PlaceholderStage>("Probability Clouds", 0.15f, 0.05f, 0.22f));
@@ -92,6 +101,12 @@ int main() {
 
             stages.current()->update(dt);
             stages.current()->render(width, height);
+
+            static bool imageSaved = false;
+            if (!imageSaved) {
+                sharedCanvas.saveToBMP("planetary_test.bmp");
+                imageSaved = true;
+            }
 
             glfwSwapBuffers(window);
             glfwPollEvents();

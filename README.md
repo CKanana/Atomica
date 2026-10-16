@@ -64,7 +64,7 @@ Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your 
 | Crystal Kanana | @TODO | TODO |
 | Donell Bikketi | @D0nell | Core + integration: project skeleton, render loop, stage manager, merging PRs |
 | Emanuel Douglas | @TODO | TODO |
-| Patrick Maina | @TODO | TODO |
+| Patrick Maina | @mainanp | Animation,  |
 | Gloria Kendi | @TODO | TODO |
 | Andrew Kigondu | @TODO | TODO |
 
