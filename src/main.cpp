@@ -360,7 +360,13 @@ int main() {
         canvas.clear(atomica::ui::Color::Background());
         layout.render(canvas);
 
-        // 2. Upload the canvas pixels to a GL texture and draw one full-screen
+        // 2. Render the active stage inside the viewport (R1 integration:
+        //    the stage draws into the shared canvas, clipped to the viewport).
+        if (stages.current()) {
+            stages.current()->render(canvas, layout->getViewportBounds());
+        }
+
+        // 3. Upload the canvas pixels to a GL texture and draw one full-screen
         //    quad through the persistent renderer.
         GLuint tex = 0;
         glGenTextures(1, &tex);
@@ -378,33 +384,6 @@ int main() {
         glfwPollEvents();
     }
 
-    while (!glfwWindowShouldClose(window)) {
-        double now = glfwGetTime();
-        double dt = now - lastTime;
-        lastTime = now;
-
-        // 1. Clear the canvas, then draw the layout (top bar, sidebars,
-        //    viewport border) on top.
-        canvas.clear(atomica::ui::Color::Background());
-        layout.render(canvas);
-
-        // 2. Upload the canvas pixels to a GL texture and draw one full-screen
-        //    quad through the persistent renderer.
-        GLuint tex = 0;
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, canvas.getWidth(), canvas.getHeight(),
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, canvas.getPixelData());
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        quad.render(tex);
-        glDeleteTextures(1, &tex);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
 
     glfwDestroyWindow(window);
     glfwTerminate();
