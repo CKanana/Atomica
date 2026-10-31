@@ -39,7 +39,7 @@ struct QuadRenderer {
             "out vec4 outColor;\n"
             "uniform sampler2D uTex;\n"
             "void main() {\n"
-            "    outColor = texture(uTex, vTex);\n"
+            "    outColor = texture(uTex, vec2(vTex.x, 1.0 - vTex.y));\n"
             "}\n";
 
         GLuint vs = glCreateShader(GL_VERTEX_SHADER);
