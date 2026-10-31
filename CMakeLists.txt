@@ -37,6 +37,33 @@ target_include_directories(atomica_ui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ui)
 add_executable(checkpoint1_demo src/ui/demo_checkpoint1.cpp)
 target_link_libraries(checkpoint1_demo PRIVATE atomica_ui)
 
+# Main Application Executable
+add_executable(atomica
+    src/main.cpp
+    src/core/StageManager.cpp
+    src/stage1_planetary/PlanetaryStage.cpp
+    src/stage2_bohr/BohrStage.cpp
+    src/stage3_waves/StandingWavesStage.cpp
+    src/stage4_clouds/ProbabilityCloudsStage.cpp
+    src/stage5_shaded/ShadedRenderingStage.cpp
+    glad_loader/glad.c
+)
+
+# Explicitly tell the compiler where all headers are located
+target_include_directories(atomica PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad_loader
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/glfw-3.3.8/include
+)
+
+# --- Link the UI library and the vendored glfw static library ---
+# GLFW is built locally in external/glfw/build/src (libglfw3.a). Link against
+# the full path so the MinGW linker resolves it; glad.c is compiled straight
+# into the atomica executable.
+target_link_libraries(atomica PRIVATE
+    atomica_ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a
+)
 # --- Fetch GLFW automatically ---
 include(FetchContent)
 FetchContent_Declare(

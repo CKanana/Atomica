@@ -30,7 +30,7 @@ UIControlPanel::UIControlPanel(const Rect& bounds)
     m_sliderWaveCount = std::make_shared<UISlider>("Wave Count (n)", 2.0f, 8.0f, 3.0f, Rect(), nullptr, 0);
     m_sliderWaveAmplitude = std::make_shared<UISlider>("Wave Amplitude", 5.0f, 30.0f, 15.0f, Rect(), nullptr, 1);
 
-    m_sliderPointDensity = std::make_shared<UISlider>("Point Density", 1000.0f, 50000.0f, 15000.0f, Rect(), nullptr, 0);
+    m_sliderPointDensity = std::make_shared<UISlider>("Point Density (%)", 0.0f, 1.0f, 0.5f, Rect(), nullptr, 0);
     m_sliderLightIntensity = std::make_shared<UISlider>("Light Intensity", 0.1f, 2.0f, 1.0f, Rect(), nullptr, 2);
 
     rebuildControlsForStage();
