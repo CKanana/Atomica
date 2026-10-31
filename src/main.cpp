@@ -363,7 +363,7 @@ int main() {
         // 2. Render the active stage inside the viewport (R1 integration:
         //    the stage draws into the shared canvas, clipped to the viewport).
         if (stages.current()) {
-            stages.current()->render(canvas, layout->getViewportBounds());
+            stages.current()->render(canvas, layout.getViewportBounds());
         }
 
         // 3. Upload the canvas pixels to a GL texture and draw one full-screen
