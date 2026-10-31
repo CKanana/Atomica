@@ -2,73 +2,92 @@
 
 **Group 5 | Quantum Visuals Inc. | Computer Graphics Semester Project**
 
-Atomica is a C++ project about how scientific models of the hydrogen atom evolved. The project is planned as a sequence of five visual stages. The current checkpoint builds a software-rendered interface and a static atom preview using computer graphics algorithms implemented in C++.
+Atomica is a C++ project about how scientific models of the hydrogen atom evolved.
+It is planned as a sequence of five visual stages, each an interactive
+OpenGL app built with GLFW, Glad, and a software canvas for the UI.
 
-## Current Checkpoint
+## Current state
 
-The `checkpoint1_demo` executable draws a 1280 x 720 interface and hydrogen atom preview, then saves the result as `checkpoint1_ui_demo.bmp` in its working directory. It runs without an OpenGL context or third-party graphics libraries.
+All five atom stage renderers are implemented and wired into the render loop:
 
-The new UI framework includes:
+| # | Stage | Renderer |
+|---|-------|----------|
+| 1 | Planetary | Electrons on fixed circular orbits (nucleus + glow) |
+| 2 | Bohr | Quantised energy levels + photon jump transition |
+| 3 | Standing Waves | de Broglie standing-wave lobes (Bézier splines) + nodes |
+| 4 | Probability Clouds | Monte-Carlo `|ψ|²` point cloud, density-tunable |
+| 5 | Shaded Rendering | Lit spherical-cloud volume with Lambertian shading |
 
-- A software canvas with line, rectangle, circle, ellipse, and cubic Bézier drawing
-- Cohen-Sutherland line clipping and alpha blending
-- An 8 x 8 bitmap font and BMP/PPM image export
-- Reusable panels, buttons, sliders, stage navigation, and information/control panels
-- A layout manager that coordinates the UI and central model viewport
-- A demo scene showing planetary orbits, a de Broglie wave preview, and hydrogen atom annotations
+The app opens a native Windows window (no DISPLAY/X11 needed). It renders the
+active stage into a shared software canvas, uploads it to a GL texture, and
+draws one full-screen textured quad each frame. The central viewport is the
+stage renderer's clip region; the side panels and navigator draw on top.
 
-The UI components expose mouse-event handling, but the current demo renders a single frame to an image rather than running as an interactive desktop window.
+## Build and run
 
-## Planned Atom Stages
-
-These stages describe the project direction; their atom renderers are not part of the current checkpoint yet.
-
-| # | Stage | Planned visualization | Graphics topics |
-|---|-------|------------------------|-----------------|
-| 1 | Planetary | Electrons on fixed circular orbits | Circle and ellipse algorithms, colour models |
-| 2 | Bohr | Quantised energy levels and photon transitions | Raster operations, frame-based animation |
-| 3 | Standing Waves | Matter waves around the nucleus | Parametric curves, Bézier splines |
-| 4 | 3D Probability Clouds | Point clouds for hydrogen s and p orbitals | 3D transformations, homogeneous coordinates |
-| 5 | Shaded Rendering | Lit and textured probability clouds | Lighting, shading, texture mapping |
-
-## Technologies
-
-- C++17
-- CMake 3.20 or newer
-- No external graphics dependencies are required for the current software-rendered checkpoint
-- OpenGL is part of the planned application direction, but is not currently used by the build
-
-## Build and Run
-
-From the repository root, configure and build with CMake:
+From the repository root. The project targets MinGW-w64 (posix-seh); the winlibs
+toolchain is expected at `C:/Users/kanan/Downloads/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-14.0.0-r7/`.
 
 ```powershell
-cmake -S . -B build
-cmake --build build --config Release
+# 1. Configure with the MinGW Makefiles generator
+cmake -S . -B build2 -G "MinGW Makefiles" -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+# 2. Build (always in a fresh folder; never rm -rf build)
+mingw32-make -C build2
 ```
 
-With the Visual Studio CMake generator, run the demo with:
+This produces `build2/atomica.exe`. The build requires:
+- `cmake` and `g++` on `PATH`
+- GLFW built from source in `external/glfw/build/` (static `libglfw3.a`)
+- A vendored Glad loader (`glad_loader/glad.c` / `.h`)
+
+Run the app:
 
 ```powershell
-.\build\Release\checkpoint1_demo.exe
+cd C:\Users\kanan\OneDrive\Desktop\Atomica
+.\build2\atomica.exe
 ```
 
-With a single-configuration generator such as Ninja, the executable is typically at `build/checkpoint1_demo.exe`. The demo writes `checkpoint1_ui_demo.bmp` to the current working directory.
+The 1280×720 window opens with the render loop running.
 
-## Team and Responsibilities
+## Controls
 
-| Member | GitHub | Responsibility |
-|--------|--------|----------------|
-| Crystal Kanana | @TODO | TODO |
-| Donell Bikketi | @TODO | TODO |
-| Emanuel Douglas | @TODO | TODO |
-| Patrick Maina | @TODO | TODO |
-| Gloria Kendi | @TODO | TODO |
-| Andrew Kigondu | @TODO | TODO |
+| Key | Action |
+|-----|--------|
+| `1`–`5` | Switch between the five stages |
+| `Left` / `Right` | Next / previous stage |
+| `Space` | Play / pause the active stage |
+| `Esc` | Close the window |
 
-Suggested split: one lead for each of Stages 1-5, plus one member owning integration, UI, testing and documentation throughout. Everyone should understand the whole application and be able to explain their contribution.
+Mouse: click/drag on the central viewport; the stage navigator and play/pause
+button are in the side panels. Each stage exposes controls via the side panels
+(speed, radius, quantum level, wave count, point density, photon jump, reset).
 
-## Timeline (12 Weeks)
+## Repository layout
+
+```
+atomica/
+├── src/
+│   ├── core/                 # Stage interface + StageManager
+│   ├── stage1_planetary/     # PlanetaryStage (circular orbits)
+│   ├── stage2_bohr/          # BohrStage (energy levels + photon jump)
+│   ├── stage3_waves/         # StandingWavesStage (Bézier lobes)
+│   ├── stage4_clouds/        # ProbabilityCloudsStage (Monte-Carlo)
+│   ├── stage5_shaded/        # ShadedRenderingStage (Lambertian)
+│   └── ui/                   # SoftwareCanvas, UI components, layout
+├── external/glfw/            # Vendored GLFW, built into external/glfw/build/
+├── glad_loader/              # Vendored Glad loader
+├── build2/                   # Build output (atomica.exe)
+├── README.md
+└── CONTRIBUTING.md
+```
+
+## Team
+
+Implemented by the team. See [CONTRIBUTING.md](CONTRIBUTING.md) for the
+contribution workflow and commit-message conventions.
+
+## Timeline
 
 | Weeks | Milestone |
 |-------|-----------|
@@ -78,26 +97,3 @@ Suggested split: one lead for each of Stages 1-5, plus one member owning integra
 | 7-9 | 3D Probability Clouds |
 | 10-11 | Shaded Rendering |
 | 12 | Integration, testing, polish |
-
-## Repository Layout
-
-```
-atomica/
-├── src/
-│   ├── core/            # Planned shared application infrastructure
-│   ├── stage1_planetary/ # Planned atom model stages
-│   ├── stage2_bohr/
-│   ├── stage3_waves/
-│   ├── stage4_clouds/
-│   ├── stage5_shaded/
-│   └── ui/              # Software canvas, UI components, layout, and demo
-├── shaders/             # Planned rendering assets
-├── assets/              # Application assets
-├── docs/                # Project documentation and design material
-├── README.md
-└── CONTRIBUTING.md
-```
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
