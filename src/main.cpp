@@ -337,7 +337,47 @@ int main() {
     });
 
     // --- Render loop (v1: clear, draw layout, show the canvas) ---
+    // --- Render loop (v2: input callbacks + UI wiring + pause gating) ---
     double lastTime = glfwGetTime();
+
+    while (!glfwWindowShouldClose(window)) {
+        double now = glfwGetTime();
+        double dt = now - lastTime;
+        lastTime = now;
+
+        // Resolve the paused state once per frame: the active stage's
+        // setPaused()/getPaused() chain is the source of truth for whether
+        // update(dt) runs. The ControlPanel button toggled the stage's
+        // paused flag directly, and the loop reads it back here.
+        bool paused = false;
+        if (stages.current()) paused = stages.current()->getPaused();
+
+        if (!paused) {
+            if (stages.current()) stages.current()->update(dt);
+        }
+
+        // 1. Clear the canvas, then draw the layout (top bar, sidebars,
+        //    viewport border) on top.
+        canvas.clear(atomica::ui::Color::Background());
+        layout.render(canvas);
+
+        // 2. Upload the canvas pixels to a GL texture and draw one full-screen
+        //    quad through the persistent renderer.
+        GLuint tex = 0;
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, canvas.getWidth(), canvas.getHeight(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, canvas.getPixelData());
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        quad.render(tex);
+        glDeleteTextures(1, &tex);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 
     while (!glfwWindowShouldClose(window)) {
         double now = glfwGetTime();
