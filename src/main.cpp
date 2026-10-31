@@ -10,6 +10,9 @@
 #include "core/StageManager.h"
 #include "stage1_planetary/PlanetaryStage.h"
 #include "ui/SoftwareCanvas.h"
+#include "stage4_clouds/CloudStage.h"
+#include "stage5_shaded/ShadedStage.h"
+
 
 static void onFramebufferResize(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
@@ -73,8 +76,9 @@ int main() {
         
         stages.add(std::make_unique<PlaceholderStage>("Bohr",            0.05f, 0.08f, 0.25f));
         stages.add(std::make_unique<PlaceholderStage>("Standing Waves",  0.05f, 0.20f, 0.10f));
-        stages.add(std::make_unique<PlaceholderStage>("Probability Clouds", 0.15f, 0.05f, 0.22f));
-        stages.add(std::make_unique<PlaceholderStage>("Shaded Rendering",   0.22f, 0.15f, 0.04f));
+        stages.add(std::make_unique<CloudStage>());
+        stages.add(std::make_unique<ShadedStage>());
+        
 
         glfwSetWindowUserPointer(window, &stages);
         glfwSetFramebufferSizeCallback(window, onFramebufferResize);

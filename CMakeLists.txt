@@ -55,6 +55,11 @@ add_executable(atomica
     src/core/StageManager.cpp
     src/stage1_planetary/PlanetaryStage.cpp
     external/glad/src/gl.c
+    src/engine3d/Shader.cpp
+    src/engine3d/CloudBuffer.cpp
+    src/stage4_clouds/Orbital.cpp
+    src/stage4_clouds/CloudStage.cpp
+    src/stage5_shaded/ShadedStage.cpp
 )
 
 # Explicitly tell the compiler where all headers are located
@@ -66,3 +71,8 @@ target_include_directories(atomica PRIVATE
 
 # Link the UI library and GLFW
 target_link_libraries(atomica PRIVATE atomica_ui glfw)
+
+enable_testing()
+add_executable(orbital_test tests/orbital_test.cpp src/stage4_clouds/Orbital.cpp)
+target_include_directories(orbital_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_test(NAME orbital_test COMMAND orbital_test)
