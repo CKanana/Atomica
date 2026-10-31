@@ -336,7 +336,6 @@ int main() {
         layout.setStage(stage);
     });
 
-    // --- Render loop (v1: clear, draw layout, show the canvas) ---
     // --- Render loop (v2: input callbacks + UI wiring + pause gating) ---
     double lastTime = glfwGetTime();
 
