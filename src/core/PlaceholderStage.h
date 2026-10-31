@@ -9,6 +9,11 @@
 
 // Stand-in until a real stage exists: draws nothing. All of the R1 virtuals are
 // safe no-ops so hidden stages never touch the GL context or allocate anything.
+#include <glad/gl.h>
+
+#include "core/Stage.h"
+
+// Stand-in until a real stage exists: fills the screen with one colour.
 class PlaceholderStage : public Stage {
 public:
     PlaceholderStage(std::string name, float r, float g, float b)
@@ -25,8 +30,13 @@ public:
     void trigger(const std::string& /*name*/) override {}
     void onMouseDrag(int /*dx*/, int /*dy*/) override {}
     void onScroll(double /*delta*/) override {}
+    void render(int, int) override {
+        glClearColor(r_, g_, b_, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
 private:
     std::string name_;
     float r_, g_, b_;
+};
 };

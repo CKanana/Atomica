@@ -27,6 +27,7 @@ public:
     // Legacy hook retained for backward-compat / porting: draws into the
     // supplied canvas at the centre of the viewport at the given time t.
     void renderXxx(atomica::ui::ICanvas& canvas, const atomica::ui::Rect& viewport, double t);
+    void render(int width, int height) override;
 
 private:
     atomica::ui::ICanvas* m_canvas;

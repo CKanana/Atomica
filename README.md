@@ -35,6 +35,11 @@ cmake -S . -B build2 -G "MinGW Makefiles" -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 # 2. Build (always in a fresh folder; never rm -rf build)
 mingw32-make -C build2
 ```
+- C++17
+- OpenGL 3.3 Core
+- GLFW (window and input), GLAD (OpenGL loader) and GLM (maths)
+- CMake build system. GLFW and GLM are downloaded automatically on the first build; GLAD is committed under `external/glad`
+- Tested with MinGW-w64 g++ (MSYS2 UCRT64) on Windows
 
 This produces `build2/atomica.exe`. The build requires:
 - `cmake` and `g++` on `PATH`
@@ -83,6 +88,32 @@ atomica/
 ```
 
 ## Team
+**Requirements:** Git, CMake 3.20 or newer, and a C++17 compiler (MinGW-w64 g++ on Windows). An internet connection is needed on the first build.
+
+```bash
+git clone https://github.com/CKanana/Atomica.git
+cd Atomica
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build
+./build/atomica.exe
+```
+
+**Controls:** keys `1` to `5` jump to a stage, the Left and Right arrow keys step through the stages, and `Esc` quits.
+
+## Adding your stage
+
+Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your class in your own stage folder, then register it in `main.cpp` in place of the matching `PlaceholderStage`. The stage manager handles switching, the render loop and key input.
+
+## Team and responsibilities
+
+| Member | GitHub | Responsibility |
+|--------|--------|----------------|
+| Crystal Kanana | @TODO | TODO |
+| Donell Bikketi | @D0nell | Core + integration: project skeleton, render loop, stage manager, merging PRs |
+| Emanuel Douglas | @TODO | TODO |
+| Patrick Maina | @mainanp | Animation,  |
+| Gloria Kendi | @TODO | TODO |
+| Andrew Kigondu | @TODO | TODO |
 
 Implemented by the team. See [CONTRIBUTING.md](CONTRIBUTING.md) for the
 contribution workflow and commit-message conventions.
@@ -97,3 +128,30 @@ contribution workflow and commit-message conventions.
 | 7-9 | 3D Probability Clouds |
 | 10-11 | Shaded Rendering |
 | 12 | Integration, testing, polish |
+
+## Repository Layout
+
+```
+Atomica/
+├── src/
+│   ├── core/            # Planned shared application infrastructure
+│   ├── stage1_planetary/ # Planned atom model stages
+│   ├── stage2_bohr/
+│   ├── stage3_waves/
+│   ├── stage4_clouds/
+│   ├── stage5_shaded/
+│   ├── ui/              # sidebar, info panel, stage navigation
+│   └── main.cpp
+├── external/
+│   └── glad/            # OpenGL loader (generated, OpenGL 3.3 core)
+├── shaders/
+├── assets/
+├── docs/                # technique write-ups, screenshots, design wireframe
+├── CMakeLists.txt
+├── README.md
+└── CONTRIBUTING.md
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).

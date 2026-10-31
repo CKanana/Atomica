@@ -64,3 +64,42 @@ target_link_libraries(atomica PRIVATE
     atomica_ui
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/build/src/libglfw3.a
 )
+# --- Fetch GLFW automatically ---
+include(FetchContent)
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.3.8
+)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glfw)
+
+# --- Main Application Executable ---
+add_executable(atomica 
+    src/main.cpp
+    src/core/StageManager.cpp
+    src/stage1_planetary/PlanetaryStage.cpp
+    external/glad/src/gl.c
+    src/engine3d/Shader.cpp
+    src/engine3d/CloudBuffer.cpp
+    src/stage4_clouds/Orbital.cpp
+    src/stage4_clouds/CloudStage.cpp
+    src/stage5_shaded/ShadedStage.cpp
+)
+
+# Explicitly tell the compiler where all headers are located
+target_include_directories(atomica PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
+    ${glfw_SOURCE_DIR}/include
+)
+
+# Link the UI library and GLFW
+target_link_libraries(atomica PRIVATE atomica_ui glfw)
+
+enable_testing()
+add_executable(orbital_test tests/orbital_test.cpp src/stage4_clouds/Orbital.cpp)
+target_include_directories(orbital_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_test(NAME orbital_test COMMAND orbital_test)

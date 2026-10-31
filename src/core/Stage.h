@@ -36,3 +36,6 @@ public:
 private:
     bool m_paused_ = false;
 };
+    virtual void render(int width, int height) = 0;
+    virtual void onKey(int /*key*/, int /*action*/) {}  // stage-specific keys
+};
