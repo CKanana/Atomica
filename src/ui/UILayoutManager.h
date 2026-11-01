@@ -22,6 +22,10 @@ namespace atomica::ui {
 class UILayoutManager {
 public:
     using StageChangeCallback = std::function<void(StageId)>;
+    // Callback invoked by render() after the viewport is cleared and bordered,
+    // giving the host/stage a place to draw the atomic model without editing the
+    // layout or the demo. Receives the canvas and the viewport rectangle.
+    using ViewportRenderCallback = std::function<void(ICanvas&, const Rect&)>;
 
 private:
     int m_windowWidth = 1280;
@@ -32,6 +36,8 @@ private:
     int m_rightSidebarWidth = 290;
 
     Rect m_viewportBounds;
+    Color m_viewportBackground = Color::Background();
+    ViewportRenderCallback m_onRenderViewport;
 
     std::shared_ptr<UIStageNavigator> m_stageNavigator;
     std::shared_ptr<UIInfoPanel> m_infoPanel;
@@ -50,6 +56,13 @@ public:
     StageId getActiveStage() const { return m_activeStage; }
 
     void setOnStageChanged(StageChangeCallback callback) { m_onStageChanged = std::move(callback); }
+
+    // Viewport background colour (defaults to Color::Background())
+    void setViewportBackground(const Color& color) { m_viewportBackground = color; }
+    Color getViewportBackground() const { return m_viewportBackground; }
+
+    // Register the viewport drawing routine (drawn after clear + border)
+    void setOnRenderViewport(ViewportRenderCallback callback) { m_onRenderViewport = std::move(callback); }
 
     // Access to components
     std::shared_ptr<UIStageNavigator> getNavigator() const { return m_stageNavigator; }

@@ -1,0 +1,15 @@
+=== CMAKE (regen) ===
+CMAKE_EXIT=1
+  C:/Users/kanan/Downloads/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-14.0.0-r7/mingw64/share/cmake-4.3/Modules/FetchContent.cmake:2158 (cmake_language)
+  C:/Users/kanan/Downloads/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-14.0.0-r7/mingw64/share/cmake-4.3/Modules/FetchContent.cmake:2399 (__FetchContent_Populate)
+  CMakeLists.txt:55 (FetchContent_MakeAvailable)
+
+
+-- Configuring incomplete, errors occurred!
+=== MAKE ===
+MAKE_EXIT=2
+mingw32-make: Entering directory 'C:/Users/kanan/OneDrive/Desktop/Atomica/build'
+mingw32-make: *** No targets specified and no makefile found.  Stop.
+mingw32-make: Leaving directory 'C:/Users/kanan/OneDrive/Desktop/Atomica/build'
+=== ARTIFACT ===
+NO ATOMICA.EXE

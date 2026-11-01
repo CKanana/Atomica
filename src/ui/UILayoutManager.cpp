@@ -58,14 +58,19 @@ void UILayoutManager::setStage(StageId stage) {
 
 void UILayoutManager::render(ICanvas& canvas) {
     // 1. Central Viewport Background & subtle grid / border
-    canvas.fillRect(m_viewportBounds, Color::Background());
+    canvas.fillRect(m_viewportBounds, m_viewportBackground);
     canvas.drawRect(m_viewportBounds, Color::Border());
 
-    // 2. Render Left and Right Panels
+    // 2. Viewport drawing hook: model/stage rendering after the viewport is prepared
+    if (m_onRenderViewport) {
+        m_onRenderViewport(canvas, m_viewportBounds);
+    }
+
+    // 3. Render Left and Right Panels
     m_infoPanel->render(canvas);
     m_controlPanel->render(canvas);
 
-    // 3. Render Top Navigation Bar
+    // 4. Render Top Navigation Bar
     m_stageNavigator->render(canvas);
 }
 
