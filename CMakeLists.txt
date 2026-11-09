@@ -57,6 +57,7 @@ add_executable(atomica
     src/stage2_bohr/BohrStage.cpp
     src/stage3_waves/StandingWavesStage.cpp
     src/stage4_clouds/ProbabilityCloudsStage.cpp
+    src/stage4_clouds/Orbital.cpp
     src/stage5_shaded/ShadedRenderingStage.cpp
     glad_loader/glad.c
 )
