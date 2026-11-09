@@ -3,6 +3,7 @@
 #include "core/Stage.h"
 #include "ui/ICanvas.h"
 #include <vector>
+#include "stage4_clouds/Orbital.h"
 
 class ProbabilityCloudsStage : public Stage {
 public:
@@ -33,4 +34,9 @@ private:
     unsigned int m_seed;
     float m_animPhase;
     std::vector<CloudNode> m_cloud;
+
+    // R4: real hydrogen orbital data (from sampleOrbital)
+    OrbitalCloud m_orbital;
+    int m_preset = 2;            // starts on 2p_z
+    void resample();
 };
