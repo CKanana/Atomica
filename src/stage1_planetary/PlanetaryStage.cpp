@@ -1,26 +1,20 @@
-// Planet stage: electrons on fixed circular orbits.
 #include "PlanetaryStage.h"
 #include <cmath>
+#include <algorithm>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-// Observatory palette (atomica::ui::Color).
-const atomica::ui::Color COLOR_NUCLEUS{251, 191, 36, 255};   // NucleusAmber
+const atomica::ui::Color COLOR_NUCLEUS{251, 191, 36, 255};
 const atomica::ui::Color COLOR_NUCLEUS_Halo{251, 191, 36, 120};
-const atomica::ui::Color COLOR_ORBIT{30, 60, 90, 255};       // OrbitPrimary
-const atomica::ui::Color COLOR_ORBIT2{40, 80, 115, 255};     // OrbitSecondary
-const atomica::ui::Color COLOR_ELECTRON{0, 229, 255, 255};   // ElectronCyan
+const atomica::ui::Color COLOR_ORBIT{30, 60, 90, 255};
+const atomica::ui::Color COLOR_ELECTRON{0, 229, 255, 255};
 const atomica::ui::Color COLOR_ELECTRON_GLOW{0, 229, 255, 100};
 
 PlanetaryStage::PlanetaryStage(atomica::ui::ICanvas* canvas)
     : m_canvas(canvas) {
-    m_nucleusRadius = 16.0f;
-    // n=1, n=2, n=3 circular orbits.
-    m_orbits.push_back({58.0f, 0.0f, 2.2f});
-    m_orbits.push_back({108.0f, 1.0f, 1.6f});
-    m_orbits.push_back({152.0f, 2.6f, 1.1f});
+    reset();
 }
 
 const char* PlanetaryStage::name() const {
@@ -28,8 +22,10 @@ const char* PlanetaryStage::name() const {
 }
 
 void PlanetaryStage::update(double dt) {
+    if (m_paused) return;
+
     for (auto& orbit : m_orbits) {
-        orbit.angle += orbit.speed * dt;
+        orbit.angle += orbit.baseSpeed * m_speedMultiplier * dt;
         if (orbit.angle > 2.0f * M_PI) {
             orbit.angle -= 2.0f * M_PI;
         }
@@ -39,51 +35,74 @@ void PlanetaryStage::update(double dt) {
 void PlanetaryStage::render(atomica::ui::ICanvas& canvas, const atomica::ui::Rect& viewport) {
     if (!m_canvas) return;
 
-    // Viewport centre.
     int cx = viewport.x + viewport.width / 2;
     int cy = viewport.y + viewport.height / 2;
 
-    // Nucleus.
+    // Draw Nucleus
     m_canvas->fillCircle(cx, cy, static_cast<int>(m_nucleusRadius), COLOR_NUCLEUS);
     m_canvas->drawCircle(cx, cy, static_cast<int>(m_nucleusRadius) + 3, COLOR_NUCLEUS_Halo);
 
-    // Orbits + electrons.
+    // Draw Elliptical Orbits + Electrons
     for (const auto& orbit : m_orbits) {
-        m_canvas->drawCircle(cx, cy, static_cast<int>(orbit.radius), COLOR_ORBIT);
-        m_canvas->drawCircle(cx, cy, static_cast<int>(orbit.radius), COLOR_ORBIT2);
-        int ex = cx + static_cast<int>(orbit.radius * std::cos(orbit.angle));
-        int ey = cy + static_cast<int>(orbit.radius * std::sin(orbit.angle));
-        m_canvas->drawCircle(ex, ey, 5, COLOR_ELECTRON);
+        // Classical mechanics parameters for an ellipse
+        float a = orbit.baseRadius * m_radiusScale;      // Semi-major axis
+        float e = m_eccentricity;                        // Eccentricity
+        float b = a * std::sqrt(1.0f - e * e);           // Semi-minor axis
+        float c = a * e;                                 // Distance from center to focus
+
+        // Offset the ellipse so the nucleus is positioned at the right focal point
+        float ellipseCenterX = cx - c;
+        float ellipseCenterY = cy;
+
+        // Draw the continuous elliptical path using 60 line segments
+        int numSegments = 60;
+        int prevX = static_cast<int>(ellipseCenterX + a * std::cos(0.0f));
+        int prevY = static_cast<int>(ellipseCenterY + b * std::sin(0.0f));
+
+        for (int i = 1; i <= numSegments; ++i) {
+            float theta = (static_cast<float>(i) / numSegments) * 2.0f * M_PI;
+            int x = static_cast<int>(ellipseCenterX + a * std::cos(theta));
+            int y = static_cast<int>(ellipseCenterY + b * std::sin(theta));
+            m_canvas->drawLine(prevX, prevY, x, y, COLOR_ORBIT);
+            prevX = x; 
+            prevY = y;
+        }
+
+        // Calculate current electron position on the ellipse
+        int ex = static_cast<int>(ellipseCenterX + a * std::cos(orbit.angle));
+        int ey = static_cast<int>(ellipseCenterY + b * std::sin(orbit.angle));
+
+        m_canvas->fillCircle(ex, ey, 5, COLOR_ELECTRON);
         m_canvas->drawCircle(ex, ey, 10, COLOR_ELECTRON_GLOW);
     }
 }
 
-// R1 control hooks.
 void PlanetaryStage::setPaused(bool paused) {
-    // Orbital motion is time-based; the renderer gates update(dt) on paused.
-    (void)paused;
+    m_paused = paused;
 }
 
 void PlanetaryStage::setSpeed(float speed) {
-    if (speed <= 0.0f) speed = 0.1f;
-    for (auto& orbit : m_orbits) {
-        orbit.speed = orbit.speed * (speed / 1.0f);
-    }
+    m_speedMultiplier = speed;
 }
 
 void PlanetaryStage::reset() {
-    m_nucleusRadius = 16.0f;
     m_orbits.clear();
     m_orbits.push_back({58.0f, 0.0f, 2.2f});
     m_orbits.push_back({108.0f, 1.0f, 1.6f});
     m_orbits.push_back({152.0f, 2.6f, 1.1f});
+    
+    m_radiusScale = 1.0f;
+    m_eccentricity = 0.0f;
+    m_speedMultiplier = 1.0f;
 }
 
 void PlanetaryStage::setParam(const std::string& name, float value) {
     if (name == "orbitRadius") {
-        for (auto& orbit : m_orbits) {
-            orbit.radius = 58.0f + ((orbit.radius - 58.0f) * (1.0f + (value - 0.5f) * 2.0f));
-        }
+        // The default UI slider starts at 120. We divide by 120 to calculate the scaling multiplier.
+        m_radiusScale = value / 120.0f; 
+    } else if (name == "eccentricity") {
+        // Limit eccentricity to 0.95 to prevent the ellipse from flattening into a straight line or crashing the sqrt()
+        m_eccentricity = std::max(0.0f, std::min(value, 0.95f));
     }
 }
 

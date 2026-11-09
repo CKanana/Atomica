@@ -2,7 +2,7 @@
 
 #include "core/Stage.h"
 #include "ui/ICanvas.h"
-#include <vector>
+#include <string>
 
 class StandingWavesStage : public Stage {
 public:
@@ -23,14 +23,11 @@ public:
     void onScroll(double delta) override;
 
 private:
-    struct WaveNode {
-        float radius;
-        float angle;
-        float n; // number of lobes
-    };
-
     atomica::ui::ICanvas* m_canvas;
-    float m_nucleusRadius;
-    float m_wavePhase;
-    std::vector<WaveNode> m_nodes;
+    bool m_paused = false;
+    
+    float m_nucleusRadius = 16.0f;
+    float m_orbitRadius = 120.0f;
+    float m_wavePhase = 0.0f;
+    int m_currentN = 3; // Quantum level (number of wavelengths)
 };
