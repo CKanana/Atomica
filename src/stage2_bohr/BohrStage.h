@@ -3,6 +3,7 @@
 #include "core/Stage.h"
 #include "ui/ICanvas.h"
 #include <vector>
+#include <string>
 
 class BohrStage : public Stage {
 public:
@@ -23,15 +24,24 @@ public:
     void onScroll(double delta) override;
 
 private:
-    struct Level {
+    struct OrbitLevel {
         float radius;
         float angle;
+        float speed;
     };
 
     atomica::ui::ICanvas* m_canvas;
-    float m_nucleusRadius;
-    int m_level;
-    bool m_transitioning;
-    float m_photonPhase;
-    std::vector<Level> m_levels;
+    bool m_paused = false;
+    float m_speedMultiplier = 1.0f;
+    float m_nucleusRadius = 16.0f;
+    
+    // State machine for tracking quantum jumps
+    int m_currentLevel = 1;
+    int m_sourceLevel = 1;
+    int m_targetLevel = 1;
+    
+    bool m_transitioning = false;
+    float m_transitionProgress = 0.0f;
+
+    std::vector<OrbitLevel> m_levels;
 };
