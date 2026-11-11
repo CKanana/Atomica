@@ -60,10 +60,15 @@ void UISlider::updateValueFromMouse(int mouseX) {
 void UISlider::render(ICanvas& canvas) {
     if (!m_visible) return;
 
-    // 1. Draw Label and Current Value text
+    // 1. Draw Label and Current Value
     std::ostringstream ss;
-    ss << m_label << ": " << std::fixed << std::setprecision(m_decimalPlaces) << m_value;
-    canvas.drawText(m_bounds.x + 4, m_bounds.y + 4, ss.str(), Color::TextSecondary());
+    ss << std::fixed << std::setprecision(m_decimalPlaces) << m_value;
+
+    canvas.drawText(m_bounds.x + 4, m_bounds.y + 4,
+                    m_label + ":", Color::TextSecondary());
+
+    canvas.drawText(m_bounds.x + 4 + static_cast<int>(m_label.length() * 8) + 8,
+                    m_bounds.y + 4, ss.str(), Color::TextPrimary());
 
     // 2. Draw Track
     Rect track = getTrackRect();
