@@ -2,156 +2,243 @@
 
 **Group 5 | Quantum Visuals Inc. | Computer Graphics Semester Project**
 
-Atomica is a C++ project about how scientific models of the hydrogen atom evolved.
-It is planned as a sequence of five visual stages, each an interactive
-OpenGL app built with GLFW, Glad, and a software canvas for the UI.
+## 1. Project Overview
 
-## Current state
+Atomica is a C++ computer graphics project that explores the evolution of scientific models of the hydrogen atom.
 
-All five atom stage renderers are implemented and wired into the render loop:
+The application presents this evolution through five interactive visual stages, progressing from the classical planetary model to quantum mechanical representations of electron probability distributions.
 
-| # | Stage | Renderer |
-|---|-------|----------|
-| 1 | Planetary | Electrons on fixed circular orbits (nucleus + glow) |
-| 2 | Bohr | Quantised energy levels + photon jump transition |
-| 3 | Standing Waves | de Broglie standing-wave lobes (Bézier splines) + nodes |
-| 4 | Probability Clouds | Monte-Carlo `|ψ|²` point cloud, density-tunable |
-| 5 | Shaded Rendering | Lit spherical-cloud volume with Lambertian shading |
+The project uses OpenGL for graphics rendering, GLFW for window management and input handling, GLAD for OpenGL function loading, and a software canvas for the user interface.
 
-The app opens a native Windows window (no DISPLAY/X11 needed). It renders the
-active stage into a shared software canvas, uploads it to a GL texture, and
-draws one full-screen textured quad each frame. The central viewport is the
-stage renderer's clip region; the side panels and navigator draw on top.
+## 2. Current Implementation
 
-## Build and run
+All five atom stage renderers have been implemented and integrated into the application's render loop.
 
-From the repository root. The project targets MinGW-w64 (posix-seh); the winlibs
-toolchain is expected at `C:/Users/kanan/Downloads/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64msvcrt-14.0.0-r7/`.
+| No. | Stage | Description |
+|---|---|---|
+| 1 | Planetary Model | Electrons moving along fixed circular orbits around a nucleus, with glow effects. |
+| 2 | Bohr Model | Quantised electron energy levels and photon jump transitions. |
+| 3 | Standing Waves | de Broglie standing-wave lobes using Bézier splines and nodes. |
+| 4 | Probability Clouds | Monte Carlo-generated electron probability distributions based on \(|\psi|^2\), with adjustable density. |
+| 5 | Shaded Rendering | Lit spherical probability clouds using Lambertian shading. |
 
-```powershell
-# 1. Configure with the MinGW Makefiles generator
-cmake -S . -B build2 -G "MinGW Makefiles" -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+### Application Architecture
 
-# 2. Build (always in a fresh folder; never rm -rf build)
-mingw32-make -C build2
-```
-- C++17
-- OpenGL 3.3 Core
-- GLFW (window and input), GLAD (OpenGL loader) and GLM (maths)
-- CMake build system. GLFW and GLM are downloaded automatically on the first build; GLAD is committed under `external/glad`
-- Tested with MinGW-w64 g++ (MSYS2 UCRT64) on Windows
+The application opens a native Windows window and renders the active stage into a shared software canvas.
 
-This produces `build2/atomica.exe`. The build requires:
-- `cmake` and `g++` on `PATH`
-- GLFW built from source in `external/glfw/build/` (static `libglfw3.a`)
-- A vendored Glad loader (`glad_loader/glad.c` / `.h`)
+The canvas is uploaded to an OpenGL texture, which is displayed using a full-screen textured quad each frame.
 
-Run the app:
+The central viewport contains the active stage renderer, while the side panels and stage navigator are drawn over the interface.
 
-```powershell
-cd C:\Users\kanan\OneDrive\Desktop\Atomica
-.\build2\atomica.exe
-```
+## 3. Technologies and Requirements
 
-The 1280×720 window opens with the render loop running.
+### Technologies
 
-## Controls
+- **C++17** – Primary programming language.
+- **OpenGL 3.3 Core** – Graphics rendering.
+- **GLFW 3.3.8** – Window creation and input handling.
+- **GLAD** – OpenGL function loading.
+- **CMake** – Build system.
 
-| Key | Action |
-|-----|--------|
-| `1`–`5` | Switch between the five stages |
-| `Left` / `Right` | Next / previous stage |
-| `Space` | Play / pause the active stage |
-| `Esc` | Close the window |
+### Development Environment
 
-Mouse: click/drag on the central viewport; the stage navigator and play/pause
-button are in the side panels. Each stage exposes controls via the side panels
-(speed, radius, quantum level, wave count, point density, photon jump, reset).
+The project is developed and tested on Windows using MinGW-w64 through MSYS2 UCRT64.
 
-## Repository layout
+### Requirements
 
-```
-atomica/
-├── src/
-│   ├── core/                 # Stage interface + StageManager
-│   ├── stage1_planetary/     # PlanetaryStage (circular orbits)
-│   ├── stage2_bohr/          # BohrStage (energy levels + photon jump)
-│   ├── stage3_waves/         # StandingWavesStage (Bézier lobes)
-│   ├── stage4_clouds/        # ProbabilityCloudsStage (Monte-Carlo)
-│   ├── stage5_shaded/        # ShadedRenderingStage (Lambertian)
-│   └── ui/                   # SoftwareCanvas, UI components, layout
-├── external/glfw/            # Vendored GLFW, built into external/glfw/build/
-├── glad_loader/              # Vendored Glad loader
-├── build2/                   # Build output (atomica.exe)
-├── README.md
-└── CONTRIBUTING.md
-```
+- Git
+- CMake 3.20 or newer
+- MinGW-w64 C++ compiler
+- MSYS2 UCRT64 development environment (recommended)
 
-## Team
-**Requirements:** Git, CMake 3.20 or newer, and a C++17 compiler (MinGW-w64 g++ on Windows). An internet connection is needed on the first build.
+The project includes a vendored GLFW source directory, so GLFW does not need to be installed separately.
+
+## 4. Installation and Build Instructions
+
+### Step 1: Clone the repository
 
 ```bash
 git clone https://github.com/CKanana/Atomica.git
 cd Atomica
-cmake -S . -B build -G "MinGW Makefiles"
-cmake --build build
-./build/atomica.exe
 ```
 
-**Controls:** keys `1` to `5` jump to a stage, the Left and Right arrow keys step through the stages, and `Esc` quits.
+### Step 2: Configure the project
 
-## Adding your stage
+Open the MSYS2 UCRT64 terminal from the repository root and run:
 
-Each stage is a class that inherits from `Stage` (`src/core/Stage.h`). Put your class in your own stage folder, then register it in `main.cpp` in place of the matching `PlaceholderStage`. The stage manager handles switching, the render loop and key input.
-
-## Team and responsibilities
-
-| Member | GitHub | Responsibility |
-|--------|--------|----------------|
-| Crystal Kanana | @TODO | TODO |
-| Donell Bikketi | @D0nell | Core + integration: project skeleton, render loop, stage manager, merging PRs |
-| Emanuel Douglas | @TODO | TODO |
-| Patrick Maina | @mainanp | Animation,  |
-| Gloria Kendi | @TODO | TODO |
-| Andrew Kigondu | @TODO | TODO |
-
-Implemented by the team. See [CONTRIBUTING.md](CONTRIBUTING.md) for the
-contribution workflow and commit-message conventions.
-
-## Timeline
-
-| Weeks | Milestone |
-|-------|-----------|
-| 1-2 | Planetary |
-| 3-4 | Bohr |
-| 5-6 | Standing Waves |
-| 7-9 | 3D Probability Clouds |
-| 10-11 | Shaded Rendering |
-| 12 | Integration, testing, polish |
-
-## Repository Layout
-
+```bash
+cmake -S . -B build2 -G "MinGW Makefiles"
 ```
+
+### Step 3: Build the application
+
+```bash
+cmake --build build2 -j4
+```
+
+### Step 4: Run Atomica
+
+From MSYS2 UCRT64:
+
+```bash
+./build2/atomica.exe
+```
+
+Alternatively, from Windows PowerShell:
+
+```powershell
+.\build2\atomica.exe
+```
+
+The application opens in a native window with a resolution of 1280 × 720 pixels.
+
+### Build Outputs
+
+The CMake configuration defines two executable targets:
+
+- `atomica.exe` – Main Atomica application.
+- `checkpoint1_demo.exe` – Software canvas demonstration.
+
+## 5. Application Controls
+
+| Key / Input | Action |
+|---|---|
+| `1` – `5` | Switch between the five stages. |
+| `Left Arrow` | Move to the previous stage. |
+| `Right Arrow` | Move to the next stage. |
+| `Space` | Play or pause the active stage. |
+| `Esc` | Close the application. |
+| Mouse | Interact with the central viewport and UI controls. |
+
+Additional stage controls are available through the side panels. Depending on the active stage, these include speed, radius, quantum level, wave count, point density, photon transitions and reset controls.
+
+## 6. Repository Structure
+
+```text
 Atomica/
 ├── src/
-│   ├── core/            # Planned shared application infrastructure
-│   ├── stage1_planetary/ # Planned atom model stages
+│   ├── core/
+│   │   ├── Animation.h
+│   │   ├── PlaceholderStage.h
+│   │   ├── Stage.h
+│   │   ├── StageManager.h
+│   │   └── StageManager.cpp
+│   │
+│   ├── engine3d/
+│   │   ├── CloudBuffer.cpp
+│   │   ├── CloudBuffer.h
+│   │   ├── Mat4.h
+│   │   ├── OrbitCamera.h
+│   │   ├── Shader.cpp
+│   │   └── Shader.h
+│   │
+│   ├── stage1_planetary/
+│   │   ├── PlanetaryStage.cpp
+│   │   └── PlanetaryStage.h
+│   │
 │   ├── stage2_bohr/
+│   │   ├── BohrStage.cpp
+│   │   └── BohrStage.h
+│   │
 │   ├── stage3_waves/
+│   │   ├── StandingWavesStage.cpp
+│   │   └── StandingWavesStage.h
+│   │
 │   ├── stage4_clouds/
+│   │   ├── CloudStage.*
+│   │   ├── Orbital.*
+│   │   ├── OrbitalPresets.h
+│   │   └── ProbabilityCloudsStage.*
+│   │
 │   ├── stage5_shaded/
-│   ├── ui/              # sidebar, info panel, stage navigation
+│   │   ├── DensityRamp.h
+│   │   ├── ShadedRenderingStage.*
+│   │   └── ShadedStage.*
+│   │
+│   ├── ui/
+│   │   ├── Font8x8.*
+│   │   ├── ICanvas.h
+│   │   ├── SoftwareCanvas.*
+│   │   ├── UIComponent.h
+│   │   ├── UIPanel.*
+│   │   ├── UIButton.*
+│   │   ├── UISlider.*
+│   │   ├── UIStageNavigator.*
+│   │   ├── UIInfoPanel.*
+│   │   ├── UIControlPanel.*
+│   │   ├── UILayoutManager.*
+│   │   └── Types.h
+│   │
 │   └── main.cpp
+│
 ├── external/
-│   └── glad/            # OpenGL loader (generated, OpenGL 3.3 core)
-├── shaders/
-├── assets/
-├── docs/                # technique write-ups, screenshots, design wireframe
+│   ├── glad/
+│   └── glfw/
+│       └── glfw-3.3.8/
+│
+├── glad_loader/
+│   ├── glad.c
+│   ├── glad.h
+│   └── khrplatform.h
+│
 ├── CMakeLists.txt
 ├── README.md
 └── CONTRIBUTING.md
 ```
 
-## Contributing
+**Note:** The main application currently compiles GLAD from `glad_loader/glad.c`. The additional `external/glad/` directory is also present in the repository.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+## 7. Adding a New Stage
+
+Each atom stage is implemented as a class that inherits from the shared `Stage` interface located in:
+
+```text
+src/core/Stage.h
+```
+
+To add or modify a stage:
+
+1. Create or update the relevant stage class in its corresponding stage directory.
+2. Implement the required stage interface methods.
+3. Register the stage with the application through the stage management and integration code.
+4. Test the stage to ensure rendering, controls and stage transitions work correctly.
+
+The `StageManager` is responsible for managing the active stage and switching between stages.
+
+## 8. Team Members and Responsibilities
+
+Atomica is developed by Group 5 – Quantum Visuals Inc. Each member is assigned responsibility for a specific component of the project.
+
+| Member | GitHub | Responsibility |
+|---|---|---|
+| Crystal Kanana | [@CKanana](https://github.com/CKanana) | UI Layout – sidebar, viewport, information panel and buttons |
+| Donell Bikketi | [@D0nell](https://github.com/D0nell) | Core and Integration – project skeleton, render loop, stage manager and pull request integration |
+| Emanuel Douglas | [@DiggaDouglas](https://github.com/DiggaDouglas) | Circles and Atoms – nucleus, electrons and orbital representations |
+| Patrick Maina | [@mainanp](https://github.com/mainanp) | Animation |
+| Gloria Kendi | [@gkendi2](https://github.com/gkendi2) | Theme and Documentation – colours, styling guide, README and screenshots |
+| Andrew Kigondu | [@Kigondinho](https://github.com/Kigondinho) | Lines and Polygons |
+
+## 9. Project Timeline
+
+| Weeks | Milestone |
+|---|---|
+| 1–2 | Planetary Model |
+| 3–4 | Bohr Model |
+| 5–6 | Standing Waves |
+| 7–9 | 3D Probability Clouds |
+| 10–11 | Shaded Rendering |
+| 12 | Integration, Testing and Polish |
+
+## 10. Contributing
+
+Atomica is developed collaboratively by Group 5.
+
+Team members should follow the project's contribution workflow when creating branches, implementing changes and submitting pull requests.
+
+For branch management, commit-message conventions and contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+**Group 5 | Quantum Visuals Inc.**
+
+*Computer Graphics Semester Project*
