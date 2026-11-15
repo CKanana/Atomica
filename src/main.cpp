@@ -145,6 +145,7 @@ struct InputContext {
     StageManager* stages = nullptr;
     atomica::ui::UILayoutManager* layout = nullptr;
     atomica::ui::SoftwareCanvas* canvas = nullptr;
+    
 };
 
 void onFramebufferResize(GLFWwindow*, int width, int height) {
@@ -160,12 +161,31 @@ void onKey(GLFWwindow* w, int key_, int, int action, int mods) {
             glfwSetWindowShouldClose(w, GLFW_TRUE);
             return;
         }
-        if (key_ >= GLFW_KEY_1 && key_ <= GLFW_KEY_5) {
-            stages->switchTo(static_cast<std::size_t>(key_ - GLFW_KEY_1));
-            return;
+       if (key_ >= GLFW_KEY_1 && key_ <= GLFW_KEY_5) {
+        if (stages->current()) stages->current()->onExit();
+        stages->switchTo(static_cast<std::size_t>(key_ - GLFW_KEY_0)); // Key 1 = Index 1
+        if (stages->current()) stages->current()->onEnter();
+        ctx->layout->setStage(static_cast<atomica::ui::StageId>(stages->currentIndex()));
+        return;
+    }
+    if (key_ == GLFW_KEY_LEFT)  { 
+        if (stages->currentIndex() > 1) { // Prevent backing into index 0
+            if (stages->current()) stages->current()->onExit();
+            stages->switchTo(stages->currentIndex() - 1); 
+            if (stages->current()) stages->current()->onEnter();
+            ctx->layout->setStage(static_cast<atomica::ui::StageId>(stages->currentIndex()));
         }
-        if (key_ == GLFW_KEY_LEFT)  { stages->previous(); return; }
-        if (key_ == GLFW_KEY_RIGHT) { stages->next();     return; }
+        return; 
+    }
+    if (key_ == GLFW_KEY_RIGHT) { 
+        if (stages->currentIndex() < 5) {
+            if (stages->current()) stages->current()->onExit();
+            stages->switchTo(stages->currentIndex() + 1);     
+            if (stages->current()) stages->current()->onEnter();
+            ctx->layout->setStage(static_cast<atomica::ui::StageId>(stages->currentIndex()));
+        }
+        return; 
+    }
         if (key_ == GLFW_KEY_SPACE) {
             if (stages->current()) stages->current()->setPaused(!stages->current()->getPaused());
             return;
@@ -195,24 +215,28 @@ void onMouseButton(GLFWwindow* w, int button, int action, int mods) {
     auto* ctx = static_cast<InputContext*>(glfwGetWindowUserPointer(w));
     StageManager* stages = ctx->stages;
     atomica::ui::UILayoutManager* layout = ctx->layout;
-    int wx, wy;
-    glfwGetCursorPos(w, reinterpret_cast<double*>(&wx), reinterpret_cast<double*>(&wy));
+    
+    // 1. Fetch exactly as doubles to prevent stack corruption
+    double cx, cy;
+    glfwGetCursorPos(w, &cx, &cy);
+    
+    // 2. Safely cast to integers
+    int wx = static_cast<int>(cx);
+    int wy = static_cast<int>(cy);
+    
     int ww, wh;
     glfwGetWindowSize(w, &ww, &wh);
     wx = std::clamp(wx, 0, ww - 1);
     wy = std::clamp(wy, 0, wh - 1);
 
     if (action == GLFW_PRESS) {
-        if (layout->handleMouseDown(wx, wy)) {
-            if (stages->current()) stages->current()->onKey(button, GLFW_PRESS);
-            return;
-        }
+        // If the UI handles the click (e.g. clicking a button), return immediately
+        if (layout->handleMouseDown(wx, wy)) return;
+        
         if (stages->current()) stages->current()->onKey(button, GLFW_PRESS);
     } else if (action == GLFW_RELEASE) {
-        if (layout->handleMouseUp(wx, wy)) {
-            if (stages->current()) stages->current()->onKey(button, GLFW_RELEASE);
-            return;
-        }
+        if (layout->handleMouseUp(wx, wy)) return;
+        
         if (stages->current()) stages->current()->onKey(button, GLFW_RELEASE);
     }
 }
@@ -271,12 +295,13 @@ int main() {
     atomica::ui::SoftwareCanvas canvas(1280, 720);
 
     // --- Stage manager + layout ---
-    StageManager stages;
-    stages.add(std::make_unique<PlanetaryStage>(&canvas));
-    stages.add(std::make_unique<BohrStage>(&canvas));
-    stages.add(std::make_unique<StandingWavesStage>(&canvas));
-    stages.add(std::make_unique<ProbabilityCloudsStage>(&canvas));
-    stages.add(std::make_unique<ShadedRenderingStage>(&canvas));
+   StageManager stages;
+stages.add(std::make_unique<PlaceholderStage>("0. Padding", 0.0f, 0.0f, 0.0f));     // Index 0: Padding
+stages.add(std::make_unique<PlanetaryStage>(&canvas));         // Index 1
+stages.add(std::make_unique<BohrStage>(&canvas));              // Index 2
+stages.add(std::make_unique<StandingWavesStage>(&canvas));     // Index 3
+stages.add(std::make_unique<ProbabilityCloudsStage>(&canvas)); // Index 4
+stages.add(std::make_unique<ShadedRenderingStage>(&canvas));   // Index 5
 
     atomica::ui::UILayoutManager layout(1280, 720);
 
@@ -341,6 +366,10 @@ int main() {
     });
 
     // --- Render loop (v2: input callbacks + UI wiring + pause gating) ---
+   stages.switchTo(1);
+    if (stages.current()) stages.current()->onEnter();
+     layout.setStage(static_cast<atomica::ui::StageId>(1));
+
     double lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {

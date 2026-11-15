@@ -3,11 +3,11 @@
 #include "core/Stage.h"
 #include "ui/ICanvas.h"
 #include <vector>
+#include <string>
 
 class PlanetaryStage : public Stage {
 public:
-    // Pass the canvas interface so the stage knows where to draw
-    explicit PlanetaryStage(atomica::ui::ICanvas* canvas);
+    PlanetaryStage(atomica::ui::ICanvas* canvas);
     ~PlanetaryStage() override = default;
 
     const char* name() const override;
@@ -15,7 +15,6 @@ public:
     void update(double dt) override;
     void render(atomica::ui::ICanvas& canvas, const atomica::ui::Rect& viewport) override;
 
-    // R1 control hooks (no-op / passthrough) so the stage satisfies the interface.
     void setPaused(bool paused) override;
     void setSpeed(float speed) override;
     void reset() override;
@@ -24,19 +23,22 @@ public:
     void onMouseDrag(int dx, int dy) override;
     void onScroll(double delta) override;
 
-    // Legacy hook retained for backward-compat / porting: draws into the
-    // supplied canvas at the centre of the viewport at the given time t.
-    void renderXxx(atomica::ui::ICanvas& canvas, const atomica::ui::Rect& viewport, double t);
-
 private:
-    atomica::ui::ICanvas* m_canvas;
-    float m_nucleusRadius;
-
     struct Orbit {
-        float radius;
-        float angle; // Current rotation in radians
-        float speed; // Angular velocity
+        float baseRadius;
+        float angle;
+        float baseSpeed;
     };
+
+    atomica::ui::ICanvas* m_canvas;
+    bool m_paused = false;
+    
+    float m_nucleusRadius = 16.0f;
+    
+    // UI-controlled parameters
+    float m_speedMultiplier = 1.0f;
+    float m_radiusScale = 1.0f;  
+    float m_eccentricity = 0.0f; 
 
     std::vector<Orbit> m_orbits;
 };
