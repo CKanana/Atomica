@@ -43,7 +43,7 @@ void UIButton::render(ICanvas& canvas) {
     // Draw centered / left text
     int textX = m_bounds.x + 10;
     int textY = m_bounds.y + (m_bounds.height / 2) - 5;
-    Color textColor = m_enabled ? (m_isHovered ? Color::TextHighlight() : m_colorText) : Color::TextSecondary();
+    Color textColor = m_enabled ? (m_isHovered ? Color::TextHighlight() : m_colorText) : Color::MutedText();
     canvas.drawText(textX, textY, m_label, textColor);
 }
 

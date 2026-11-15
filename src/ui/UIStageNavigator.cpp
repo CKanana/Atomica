@@ -1,3 +1,4 @@
+
 #include "UIStageNavigator.h"
 
 namespace atomica::ui {
@@ -90,51 +91,162 @@ void UIStageNavigator::prevStage() {
 void UIStageNavigator::render(ICanvas& canvas) {
     if (!m_visible) return;
 
-    // 1. Bar Background & Bottom Border
+    // 1. Draw navigation bar
     canvas.fillRect(m_bounds, Color::PanelSurface());
-    canvas.drawLine(m_bounds.x, m_bounds.bottom() - 1, m_bounds.right(), m_bounds.bottom() - 1, Color::Border());
 
-    // 2. Connecting timeline line between stages
+    canvas.drawLine(
+        m_bounds.x,
+        m_bounds.bottom() - 1,
+        m_bounds.right(),
+        m_bounds.bottom() - 1,
+        Color::Border()
+    );
+
+    // 2. Draw timeline
     if (m_nodes.size() >= 2) {
         int lineY = m_bounds.y + (m_bounds.height / 2);
-        int startLineX = m_nodes.front().bounds.x + (m_nodes.front().bounds.width / 2);
-        int endLineX = m_nodes.back().bounds.x + (m_nodes.back().bounds.width / 2);
-        canvas.drawLine(startLineX, lineY, endLineX, lineY, Color::Border());
+        int startLineX = m_nodes.front().bounds.x
+                       + (m_nodes.front().bounds.width / 2);
+
+        int endLineX = m_nodes.back().bounds.x
+                     + (m_nodes.back().bounds.width / 2);
+
+        // Full timeline
+        canvas.drawLine(
+            startLineX, lineY,
+            endLineX, lineY,
+            Color::Border()
+        );
+
+        // Completed timeline portion
+        if (static_cast<int>(m_currentStage) >
+            static_cast<int>(StageId::PLANETARY)) {
+
+            // StageId starts at 1, but vector indexing starts at 0
+            int activeIndex = static_cast<int>(m_currentStage) - 1;
+
+            if (activeIndex >= 0 &&
+                activeIndex < static_cast<int>(m_nodes.size())) {
+
+                int activeLineX = m_nodes[activeIndex].bounds.x
+                                + (m_nodes[activeIndex].bounds.width / 2);
+
+                canvas.drawLine(
+                    startLineX, lineY,
+                    activeLineX, lineY,
+                    Color::SuccessGreen()
+                );
+            }
+        }
     }
 
-    // 3. Render Stage Nodes
+    // 3. Render stage nodes
     for (const auto& node : m_nodes) {
         bool isActive = (node.id == m_currentStage);
-        bool isPast = (static_cast<int>(node.id) < static_cast<int>(m_currentStage));
 
-        // Node card background
-        Color nodeBg = isActive ? Color::AccentSurface() : (node.isHovered ? Color::ControlSurface() : Color::PanelSurface());
+        bool isPast = (
+            static_cast<int>(node.id) <
+            static_cast<int>(m_currentStage)
+        );
+
+        bool isHovered = node.isHovered;
+
+        // Stage background
+        Color nodeBg = Color::PanelSurface();
+
+        if (isPast) {
+            nodeBg = Color(16, 42, 38);
+        }
+        else if (isActive) {
+            nodeBg = Color(16, 48, 64);
+        }
+        else if (isHovered) {
+            nodeBg = Color::ControlHover();
+        }
+
         canvas.fillRect(node.bounds, nodeBg);
 
-        // Node border
-        Color nodeBorder = isActive ? Color::BorderActive() : (isPast ? Color::TextHighlight() : Color::Border());
+        // Stage border
+        Color nodeBorder = Color::Border();
+
+        if (isPast) {
+            nodeBorder = Color::SuccessGreen();
+        }
+        else if (isActive) {
+            nodeBorder = Color::BorderActive();
+        }
+
         canvas.drawRect(node.bounds, nodeBorder);
 
-        // Small indicator circle on the card
+        // Stage indicator
         int circleX = node.bounds.x + 14;
         int circleY = node.bounds.y + (node.bounds.height / 2);
-        int circleRadius = 5;
+        int circleRadius = isActive ? 6 : 5;
 
-        Color circleColor = isActive ? Color::BorderActive() : (isPast ? Color::TextSecondary() : Color::Border());
-        canvas.fillCircle(circleX, circleY, circleRadius, circleColor);
+        Color circleColor = Color::Border();
 
-        // Stage Title
-        Color textColor = isActive ? Color::TextPrimary() : Color::TextSecondary();
-        canvas.drawText(node.bounds.x + 26, node.bounds.y + 8, node.label, textColor);
+        if (isPast) {
+            circleColor = Color::SuccessGreen();
+        }
+        else if (isActive) {
+            circleColor = Color::ElectronCyan();
+        }
 
-        // Stage Year
-        Color yearColor = isActive ? Color::TextHighlight() : Color::MutedText();
-        canvas.drawText(node.bounds.x + 26, node.bounds.y + 24, node.year, yearColor);
+        canvas.fillCircle(
+            circleX,
+            circleY,
+            circleRadius,
+            circleColor
+        );
+
+        // Stage title
+        Color textColor = Color::MutedText();
+
+        if (isPast) {
+            textColor = Color::SuccessGreen();
+        }
+        else if (isActive) {
+            textColor = Color::TextPrimary();
+        }
+        else if (isHovered) {
+            textColor = Color::TextSecondary();
+        }
+
+        canvas.drawText(
+            node.bounds.x + 26,
+            node.bounds.y + 8,
+            node.label,
+            textColor
+        );
+
+        // Stage year
+        Color yearColor = Color::MutedText();
+
+        if (isPast) {
+            yearColor = Color::SuccessGreen();
+        }
+        else if (isActive) {
+            yearColor = Color::TextHighlight();
+        }
+
+        canvas.drawText(
+            node.bounds.x + 26,
+            node.bounds.y + 24,
+            node.year,
+            yearColor
+        );
     }
 
-    // 4. Render Prev and Next Buttons
-    m_btnPrev->setEnabled(static_cast<int>(m_currentStage) > static_cast<int>(StageId::PLANETARY));
-    m_btnNext->setEnabled(static_cast<int>(m_currentStage) < static_cast<int>(StageId::SHADED_RENDERING));
+    // 4. Render navigation buttons
+    m_btnPrev->setEnabled(
+        static_cast<int>(m_currentStage) >
+        static_cast<int>(StageId::PLANETARY)
+    );
+
+    m_btnNext->setEnabled(
+        static_cast<int>(m_currentStage) <
+        static_cast<int>(StageId::SHADED_RENDERING)
+    );
 
     m_btnPrev->render(canvas);
     m_btnNext->render(canvas);
@@ -142,6 +254,7 @@ void UIStageNavigator::render(ICanvas& canvas) {
 
 bool UIStageNavigator::onMouseMove(int mouseX, int mouseY) {
     if (!m_visible || !m_enabled) return false;
+
     UIComponent::onMouseMove(mouseX, mouseY);
 
     m_btnPrev->onMouseMove(mouseX, mouseY);
@@ -150,6 +263,7 @@ bool UIStageNavigator::onMouseMove(int mouseX, int mouseY) {
     for (auto& node : m_nodes) {
         node.isHovered = node.bounds.contains(mouseX, mouseY);
     }
+
     return m_isHovered;
 }
 
@@ -165,6 +279,7 @@ bool UIStageNavigator::onMouseDown(int mouseX, int mouseY) {
             return true;
         }
     }
+
     return m_bounds.contains(mouseX, mouseY);
 }
 
