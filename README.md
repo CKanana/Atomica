@@ -1,7 +1,21 @@
 # Atomica: From Orbits to Probability Clouds
 
 **Group 5 | Quantum Visuals Inc. | Computer Graphics Semester Project**
+![Atomica demo](docs/demo/atomica_demo.gif)
 
+*The 3D probability-cloud stage running live: a 2p orbital sampled from the hydrogen wavefunction.*
+
+### Screenshots
+
+| 1. Planetary | 2. Bohr | 3. Standing Waves |
+|---|---|---|
+| ![Planetary](docs/screenshots/stage1_planetary.png) | ![Bohr](docs/screenshots/stage2_bohr.png) | ![Waves](docs/screenshots/stage3_waves.png) |
+
+| 4. Probability Clouds | 5. Shaded Rendering |
+|---|---|
+| ![Clouds](docs/screenshots/stage4_clouds.png) | ![Shaded](docs/screenshots/stage5_shaded.png) |
+
+**Demo video:** https://youtu.be/JU4uCzQXlBY
 ## 1. Project Overview
 
 Atomica is a C++ computer graphics project that explores the evolution of scientific models of the hydrogen atom.
@@ -20,7 +34,7 @@ All five atom stage renderers have been implemented and integrated into the appl
 | 2 | Bohr Model | Quantised electron energy levels and photon jump transitions. |
 | 3 | Standing Waves | de Broglie standing-wave lobes using Bézier splines and nodes. |
 | 4 | Probability Clouds | Monte Carlo-generated electron probability distributions based on \(|\psi|^2\), with adjustable density. |
-| 5 | Shaded Rendering | Lit spherical probability clouds using Lambertian shading. |
+| 5 | Shaded Rendering | Blinn-Phong-lit point cloud with a 1D colour-ramp texture and depth fog |
 
 ### Application Architecture
 
@@ -108,7 +122,7 @@ The CMake configuration defines two executable targets:
 | `Right Arrow` | Move to the next stage. |
 | `Space` | Play or pause the active stage. |
 | `Esc` | Close the application. |
-| Mouse | Interact with the central viewport and UI controls. |
+| | Sliders and buttons | Speed, pause, reset, orbit radius, eccentricity, energy level, photon jump, wave count, wave amplitude, point density and light intensity, depending on the stage. |
 
 Additional stage controls are available through the side panels. Depending on the active stage, these include speed, radius, quantum level, wave count, point density, photon transitions and reset controls.
 
@@ -204,6 +218,16 @@ To add or modify a stage:
 4. Test the stage to ensure rendering, controls and stage transitions work correctly.
 
 The `StageManager` is responsible for managing the active stage and switching between stages.
+## Graphics Techniques
+
+| Technique | Stage |
+|---|---|
+| Midpoint circle and ellipse algorithms | 1 Planetary |
+| Raster operations and frame-based animation | 2 Bohr |
+| Parametric curves and Bézier splines | 3 Standing Waves |
+| 3D transformations and homogeneous coordinates | 4 Probability Clouds |
+| Monte Carlo sampling of hydrogen ψ² | 4 Probability Clouds |
+| Blinn-Phong lighting, 1D texture ramp, fog | 5 Shaded Rendering |
 
 ## 8. Team Members and Responsibilities
 
