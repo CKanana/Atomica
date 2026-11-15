@@ -1,9 +1,12 @@
 # Atomica: From Orbits to Probability Clouds
 
 **Group 5 | Quantum Visuals Inc. | Computer Graphics Semester Project**
+
 ![Atomica demo](docs/demo/atomica_demo.gif)
 
 *The 3D probability-cloud stage running live: a 2p orbital sampled from the hydrogen wavefunction.*
+
+**Demo video:** [YouTube link here]
 
 ### Screenshots
 
@@ -15,7 +18,6 @@
 |---|---|
 | ![Clouds](docs/screenshots/stage4_clouds.png) | ![Shaded](docs/screenshots/stage5_shaded.png) |
 
-**Demo video:** https://youtu.be/JU4uCzQXlBY
 ## 1. Project Overview
 
 Atomica is a C++ computer graphics project that explores the evolution of scientific models of the hydrogen atom.
@@ -34,13 +36,13 @@ All five atom stage renderers have been implemented and integrated into the appl
 | 2 | Bohr Model | Quantised electron energy levels and photon jump transitions. |
 | 3 | Standing Waves | de Broglie standing-wave lobes using Bézier splines and nodes. |
 | 4 | Probability Clouds | Monte Carlo-generated electron probability distributions based on \(|\psi|^2\), with adjustable density. |
-| 5 | Shaded Rendering | Blinn-Phong-lit point cloud with a 1D colour-ramp texture and depth fog |
+| 5 | Shaded Rendering | Blinn-Phong-lit point cloud with a 1D colour-ramp texture and depth fog. |
 
 ### Application Architecture
 
-The application opens a native Windows window and renders the active stage into a shared software canvas.
+Atomica uses a **software rasterizer**: our own C++ code (`SoftwareCanvas`) computes every pixel of the 1280 x 720 frame, including lines, circles, curves, point clouds, lighting and the UI. OpenGL is used only to display the finished image, as a texture on a full-screen quad.
 
-The canvas is uploaded to an OpenGL texture, which is displayed using a full-screen textured quad each frame.
+The application opens a native Windows window and renders the active stage into the shared software canvas each frame.
 
 The central viewport contains the active stage renderer, while the side panels and stage navigator are drawn over the interface.
 
@@ -122,9 +124,7 @@ The CMake configuration defines two executable targets:
 | `Right Arrow` | Move to the next stage. |
 | `Space` | Play or pause the active stage. |
 | `Esc` | Close the application. |
-| | Sliders and buttons | Speed, pause, reset, orbit radius, eccentricity, energy level, photon jump, wave count, wave amplitude, point density and light intensity, depending on the stage. |
-
-Additional stage controls are available through the side panels. Depending on the active stage, these include speed, radius, quantum level, wave count, point density, photon transitions and reset controls.
+| Sliders and buttons | Speed, pause, reset, orbit radius, eccentricity, energy level, photon jump, wave count, wave amplitude, point density and light intensity, depending on the stage. |
 
 ## 6. Repository Structure
 
@@ -218,18 +218,19 @@ To add or modify a stage:
 4. Test the stage to ensure rendering, controls and stage transitions work correctly.
 
 The `StageManager` is responsible for managing the active stage and switching between stages.
-## Graphics Techniques
+
+## 8. Graphics Techniques
 
 | Technique | Stage |
 |---|---|
 | Midpoint circle and ellipse algorithms | 1 Planetary |
 | Raster operations and frame-based animation | 2 Bohr |
-| Parametric curves and Bézier splines | 3 Standing Waves |
+| Parametric curves and Bezier splines | 3 Standing Waves |
 | 3D transformations and homogeneous coordinates | 4 Probability Clouds |
-| Monte Carlo sampling of hydrogen ψ² | 4 Probability Clouds |
+| Monte Carlo sampling of hydrogen |psi|^2 | 4 Probability Clouds |
 | Blinn-Phong lighting, 1D texture ramp, fog | 5 Shaded Rendering |
 
-## 8. Team Members and Responsibilities
+## 9. Team Members and Responsibilities
 
 Atomica is developed by Group 5 – Quantum Visuals Inc. Each member is assigned responsibility for a specific component of the project.
 
@@ -242,7 +243,7 @@ Atomica is developed by Group 5 – Quantum Visuals Inc. Each member is assigned
 | Gloria Kendi | [@gkendi2](https://github.com/gkendi2) | Theme and Documentation – colours, styling guide, README and screenshots |
 | Andrew Kigondu | [@Kigondinho](https://github.com/Kigondinho) | Lines and Polygons |
 
-## 9. Project Timeline
+## 10. Project Timeline
 
 | Weeks | Milestone |
 |---|---|
@@ -253,7 +254,7 @@ Atomica is developed by Group 5 – Quantum Visuals Inc. Each member is assigned
 | 10–11 | Shaded Rendering |
 | 12 | Integration, Testing and Polish |
 
-## 10. Contributing
+## 11. Contributing
 
 Atomica is developed collaboratively by Group 5.
 
